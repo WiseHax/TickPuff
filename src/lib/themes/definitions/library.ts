@@ -1,0 +1,73 @@
+import type { ThemeDefinition } from '$lib/types';
+
+export const library: ThemeDefinition = {
+  id: 'library',
+  name: 'Magic Library',
+  description: 'A cozy magical study',
+  allowedWeather: ['clear', 'dust'],
+  defaultWeather: 'dust',
+  companions: ['owl', 'cat'],
+  defaultCompanion: 'owl',
+  clock: { font: 'Outfit', shadow: '0 4px 15px rgba(255, 193, 7, 0.3)' },
+  ambient: [],
+  colors: {
+    morning: {
+      bgTop: '#d7ccc8',
+      bgBottom: '#795548',
+      text: '#fff3e0',
+      textMuted: '#ffcc80',
+      accent: '#ffb300',
+      glass: 'rgba(121, 85, 72, 0.6)',
+    },
+    day: {
+      bgTop: '#bcaaa4',
+      bgBottom: '#5d4037',
+      text: '#fff3e0',
+      textMuted: '#ffcc80',
+      accent: '#ffb300',
+      glass: 'rgba(93, 64, 55, 0.6)',
+    },
+    sunset: {
+      bgTop: '#ffcc80',
+      bgBottom: '#4e342e',
+      text: '#fff3e0',
+      textMuted: '#ffcc80',
+      accent: '#ffb300',
+      glass: 'rgba(78, 52, 46, 0.6)',
+    },
+    night: {
+      bgTop: '#2b1b17',
+      bgBottom: '#1e1311',
+      text: '#ffe0b2',
+      textMuted: '#ffb74d',
+      accent: '#ff9800',
+      glass: 'rgba(30, 19, 17, 0.8)',
+    },
+    'late-night': {
+      bgTop: '#140c0a',
+      bgBottom: '#0a0605',
+      text: '#ffcc80',
+      textMuted: '#ffa726',
+      accent: '#f57c00',
+      glass: 'rgba(10, 6, 5, 0.9)',
+    },
+  },
+  stage: {
+    minX: 0.34,
+    maxX: 0.84,
+    medium: 'ground',
+    zones: [
+      { id: 'books', label: 'Stack of books', kind: 'rest', x: 0.36, depth: 0.25, activity: 'sleep', stay: [12, 25] },
+      {
+        id: 'candle',
+        label: 'Candle',
+        kind: 'interact',
+        x: 0.66,
+        depth: 0.3,
+        activity: 'sit',
+        stay: [8, 15],
+        when: ['sunset', 'night', 'late-night'],
+      },
+    ],
+  },
+};

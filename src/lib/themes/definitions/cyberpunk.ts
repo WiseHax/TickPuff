@@ -1,0 +1,73 @@
+import type { ThemeDefinition } from '$lib/types';
+
+export const cyberpunk: ThemeDefinition = {
+  id: 'cyberpunk',
+  name: 'Cyber City',
+  description: 'A neon-lit futuristic rooftop',
+  allowedWeather: ['clear', 'rain', 'heavy-rain', 'fog'],
+  defaultWeather: 'rain',
+  companions: ['robot', 'drone'],
+  defaultCompanion: 'robot',
+  clock: { font: 'VT323', shadow: '0 0 20px #0ff, 0 0 40px #0ff' },
+  ambient: [{ effect: 'sparks', when: ['sunset', 'night', 'late-night'] }],
+  colors: {
+    morning: {
+      bgTop: '#2c3e50',
+      bgBottom: '#000000',
+      text: '#00ffff',
+      textMuted: '#00aaaa',
+      accent: '#ff00ff',
+      glass: 'rgba(0,0,0,0.6)',
+    },
+    day: {
+      bgTop: '#34495e',
+      bgBottom: '#111111',
+      text: '#00ffff',
+      textMuted: '#00aaaa',
+      accent: '#ff00ff',
+      glass: 'rgba(0,0,0,0.6)',
+    },
+    sunset: {
+      bgTop: '#f39c12',
+      bgBottom: '#2c3e50',
+      text: '#00ffff',
+      textMuted: '#00aaaa',
+      accent: '#ff00ff',
+      glass: 'rgba(0,0,0,0.6)',
+    },
+    night: {
+      bgTop: '#000428',
+      bgBottom: '#004e92',
+      text: '#00ffff',
+      textMuted: '#00aaaa',
+      accent: '#ff00ff',
+      glass: 'rgba(0,0,0,0.8)',
+    },
+    'late-night': {
+      bgTop: '#000000',
+      bgBottom: '#0a0a0a',
+      text: '#00ffff',
+      textMuted: '#00aaaa',
+      accent: '#ff00ff',
+      glass: 'rgba(0,0,0,0.9)',
+    },
+  },
+  stage: {
+    minX: 0.34,
+    maxX: 0.88,
+    medium: 'ground',
+    zones: [
+      {
+        id: 'neon-sign',
+        label: 'Neon sign',
+        kind: 'interact',
+        x: 0.76,
+        depth: 0.55,
+        activity: 'look',
+        stay: [5, 10],
+        when: ['sunset', 'night', 'late-night'],
+      },
+      { id: 'railing', label: 'Rooftop railing', kind: 'rest', x: 0.52, depth: 0.95, activity: 'sit', stay: [10, 20] },
+    ],
+  },
+};

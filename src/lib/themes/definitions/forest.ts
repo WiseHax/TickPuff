@@ -1,0 +1,65 @@
+import type { ThemeDefinition } from '$lib/types';
+
+export const forest: ThemeDefinition = {
+  id: 'forest',
+  name: 'Cozy Forest',
+  description: 'A deep woodland clearing',
+  allowedWeather: ['clear', 'fog', 'rain', 'heavy-rain', 'snow', 'leaves'],
+  defaultWeather: 'fog',
+  companions: ['cat', 'fox', 'bear'],
+  defaultCompanion: 'cat',
+  clock: { font: 'Pixelify Sans', shadow: '0 4px 20px rgba(0,0,0,0.8)' },
+  ambient: [{ effect: 'fireflies', when: ['night', 'late-night'] }],
+  colors: {
+    morning: {
+      bgTop: '#8da684',
+      bgBottom: '#4e6e58',
+      text: '#e8f5e9',
+      textMuted: '#a5d6a7',
+      accent: '#4caf50',
+      glass: 'rgba(78, 110, 88, 0.4)',
+    },
+    day: {
+      bgTop: '#5b8266',
+      bgBottom: '#2b4534',
+      text: '#e8f5e9',
+      textMuted: '#a5d6a7',
+      accent: '#4caf50',
+      glass: 'rgba(43, 69, 52, 0.4)',
+    },
+    sunset: {
+      bgTop: '#d4886a',
+      bgBottom: '#3a3b34',
+      text: '#ffede4',
+      textMuted: '#eab8a3',
+      accent: '#ff9800',
+      glass: 'rgba(58, 59, 52, 0.4)',
+    },
+    night: {
+      bgTop: '#10161d',
+      bgBottom: '#1a2a22',
+      text: '#e8f5e9',
+      textMuted: '#a5d6a7',
+      accent: '#4caf50',
+      glass: 'rgba(26, 42, 34, 0.4)',
+    },
+    'late-night': {
+      bgTop: '#080a0e',
+      bgBottom: '#0d1511',
+      text: '#c8d5c9',
+      textMuted: '#759677',
+      accent: '#2e7d32',
+      glass: 'rgba(13, 21, 17, 0.6)',
+    },
+  },
+  stage: {
+    minX: 0.36,
+    maxX: 0.84,
+    medium: 'ground',
+    zones: [
+      { id: 'mushrooms', label: 'Mushrooms', kind: 'interact', x: 0.37, depth: 0.1, activity: 'look', stay: [4, 8] },
+      { id: 'pine', label: 'Under the pine', kind: 'shelter', x: 0.82, depth: 0.35, activity: 'sleep', stay: [12, 25] },
+      { id: 'clearing', label: 'Clearing', kind: 'rest', x: 0.6, depth: 0.55, activity: 'sit', stay: [8, 16] },
+    ],
+  },
+};

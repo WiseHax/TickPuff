@@ -1,0 +1,72 @@
+import type { ThemeDefinition } from '$lib/types';
+
+export const sakura: ThemeDefinition = {
+  id: 'sakura',
+  name: 'Sakura Dream',
+  description: 'A quiet Japanese-inspired village',
+  allowedWeather: ['clear', 'petals', 'rain'],
+  defaultWeather: 'petals',
+  companions: ['fox', 'cat', 'bunny'],
+  defaultCompanion: 'fox',
+  clock: { font: 'Outfit', shadow: '0 4px 15px rgba(255, 64, 129, 0.4)' },
+  ambient: [],
+  colors: {
+    morning: {
+      bgTop: '#ffcdd2',
+      bgBottom: '#f8bbd0',
+      text: '#4a148c',
+      textMuted: '#7b1fa2',
+      accent: '#c2185b',
+      glass: 'rgba(255, 255, 255, 0.4)',
+    },
+    day: {
+      bgTop: '#f8bbd0',
+      bgBottom: '#e1bee7',
+      text: '#4a148c',
+      textMuted: '#7b1fa2',
+      accent: '#c2185b',
+      glass: 'rgba(255, 255, 255, 0.4)',
+    },
+    sunset: {
+      bgTop: '#ffb74d',
+      bgBottom: '#f06292',
+      text: '#ffffff',
+      textMuted: '#ffcdd2',
+      accent: '#ff4081',
+      glass: 'rgba(240, 98, 146, 0.4)',
+    },
+    night: {
+      bgTop: '#2a1a24',
+      bgBottom: '#3d2532',
+      text: '#fce4ec',
+      textMuted: '#f48fb1',
+      accent: '#ff4081',
+      glass: 'rgba(42, 26, 36, 0.4)',
+    },
+    'late-night': {
+      bgTop: '#180e15',
+      bgBottom: '#22141c',
+      text: '#d9c2cb',
+      textMuted: '#c46988',
+      accent: '#d81b60',
+      glass: 'rgba(24, 14, 21, 0.6)',
+    },
+  },
+  stage: {
+    minX: 0.34,
+    maxX: 0.86,
+    medium: 'ground',
+    zones: [
+      { id: 'torii', label: 'Torii gate', kind: 'rest', x: 0.5, depth: 0.75, activity: 'sit', stay: [10, 20] },
+      {
+        id: 'blossoms',
+        label: 'Under the blossoms',
+        kind: 'shelter',
+        x: 0.78,
+        depth: 0.45,
+        activity: 'sleep',
+        stay: [12, 25],
+      },
+    ],
+  },
+};
