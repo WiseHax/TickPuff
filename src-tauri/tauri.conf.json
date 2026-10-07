@@ -12,27 +12,40 @@
   "app": {
     "windows": [
       {
+        "label": "main",
         "title": "TickPuff",
         "width": 1024,
         "height": 600,
+        "minWidth": 480,
+        "minHeight": 320,
         "decorations": false,
-        "transparent": true,
-        "resizable": true
+        "resizable": true,
+        "center": true
       }
     ],
     "security": {
-      "csp": null
+      "csp": {
+        "default-src": "'self'",
+        "script-src": "'self'",
+        "style-src": "'self' 'unsafe-inline'",
+        "img-src": "'self' data: blob:",
+        "font-src": "'self' data:",
+        "connect-src": "'self' ipc: http://ipc.localhost https://api.open-meteo.com https://geocoding-api.open-meteo.com",
+        "object-src": "'none'",
+        "base-uri": "'self'",
+        "frame-ancestors": "'none'"
+      }
     }
   },
   "bundle": {
     "active": true,
     "targets": "all",
-    "icon": [
-      "icons/32x32.png",
-      "icons/128x128.png",
-      "icons/128x128@2x.png",
-      "icons/icon.icns",
-      "icons/icon.ico"
-    ]
+    "category": "Utility",
+    "shortDescription": "Ambient desktop clock with a living companion",
+    "longDescription": "TickPuff is a lightweight ambient desktop clock with themed worlds, a roaming 3D companion and optional focus, task and developer widgets.",
+    "copyright": "Copyright (c) 2026 TickPuff contributors",
+    "license": "MIT",
+    "homepage": "https://github.com/WiseHax/TickPuff",
+    "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.icns", "icons/icon.ico"]
   }
 }

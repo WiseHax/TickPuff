@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024">
+  <!-- TickPuff app icon (original artwork, MIT licensed with the project). -->
+  <defs>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#3b4f7a"/>
+      <stop offset="1" stop-color="#1b2338"/>
+    </linearGradient>
+    <linearGradient id="face" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fffaf0"/>
+      <stop offset="1" stop-color="#f1e6cf"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#ffe9a8" stop-opacity="0.45"/>
+      <stop offset="1" stop-color="#ffe9a8" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect x="32" y="32" width="960" height="960" rx="220" fill="url(#sky)"/>
+  <circle cx="512" cy="590" r="380" fill="url(#glow)"/>
+  <circle cx="200" cy="210" r="10" fill="#ffffff" opacity="0.8"/>
+  <circle cx="820" cy="180" r="7" fill="#ffffff" opacity="0.7"/>
+  <circle cx="860" cy="330" r="5" fill="#ffffff" opacity="0.6"/>
+  <circle cx="150" cy="420" r="6" fill="#ffffff" opacity="0.6"/>
+  <!-- Clock face -->
+  <circle cx="512" cy="600" r="290" fill="url(#face)"/>
+  <circle cx="512" cy="600" r="290" fill="none" stroke="#e2d2ae" stroke-width="14"/>
+  <g fill="#c9b78f">
+    <rect x="502" y="345" width="20" height="44" rx="10"/>
+    <rect x="502" y="811" width="20" height="44" rx="10"/>
+    <rect x="735" y="590" width="44" height="20" rx="10"/>
+    <rect x="245" y="590" width="44" height="20" rx="10"/>
+  </g>
+  <g stroke="#2b3a5c" stroke-linecap="round">
+    <line x1="512" y1="600" x2="420" y2="520" stroke-width="30"/>
+    <line x1="512" y1="600" x2="640" y2="470" stroke-width="22"/>
+  </g>
+  <circle cx="512" cy="600" r="26" fill="#ff8a65"/>
+  <!-- The puff, peeking over the clock -->
+  <g>
+    <circle cx="400" cy="300" r="92" fill="#ffffff"/>
+    <circle cx="512" cy="250" r="118" fill="#ffffff"/>
+    <circle cx="628" cy="300" r="92" fill="#ffffff"/>
+    <circle cx="470" cy="345" r="90" fill="#ffffff"/>
+    <circle cx="560" cy="345" r="90" fill="#ffffff"/>
+    <ellipse cx="468" cy="282" rx="17" ry="24" fill="#2b3a5c"/>
+    <ellipse cx="556" cy="282" rx="17" ry="24" fill="#2b3a5c"/>
+    <circle cx="474" cy="273" r="6" fill="#ffffff"/>
+    <circle cx="562" cy="273" r="6" fill="#ffffff"/>
+    <ellipse cx="430" cy="320" rx="26" ry="15" fill="#ffb3c4"/>
+    <ellipse cx="594" cy="320" rx="26" ry="15" fill="#ffb3c4"/>
+    <path d="M498 318 Q512 334 526 318" fill="none" stroke="#2b3a5c" stroke-width="10" stroke-linecap="round"/>
+  </g>
+</svg>
