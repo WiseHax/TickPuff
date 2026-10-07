@@ -1,13 +1,39 @@
-.DS_Store
-node_modules
+# Dependencies
+node_modules/
+
+# Build output
 /build
 /.svelte-kit
 /package
+/dist
+/coverage
+src-tauri/target/
+src-tauri/gen/schemas/
+
+# Environment and secrets
 .env
 .env.*
 !.env.example
+*.pem
+*.key
+
+# Logs and temporary files
+*.log
+npm-debug.log*
+*.tmp
+*.bak
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 
-# Local agent/editor tooling
+# OS and editor files
+.DS_Store
+Thumbs.db
+desktop.ini
+.idea/
+*.swp
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# Local agent tooling
 /.claude
