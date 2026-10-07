@@ -1,10 +1,20 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Capability for the main window",
+  "description": "Permissions for the main TickPuff window. Keep this minimal.",
   "windows": ["main"],
   "permissions": [
-    "core:default",
-    "opener:default"
+    "core:app:default",
+    "core:event:default",
+    "core:window:default",
+    "core:window:allow-start-dragging",
+    "core:window:allow-minimize",
+    "core:window:allow-close",
+    "core:window:allow-set-fullscreen",
+    "core:window:allow-is-fullscreen",
+    {
+      "identifier": "opener:allow-open-url",
+      "allow": [{ "url": "https://github.com/WiseHax/TickPuff*" }, { "url": "https://open-meteo.com*" }]
+    }
   ]
 }
