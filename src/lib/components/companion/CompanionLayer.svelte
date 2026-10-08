@@ -9,7 +9,12 @@
   import { ambientEffects, effectiveWeather } from '$lib/stores/atmosphere';
   import { focusActive } from '$lib/stores/focus';
   import { COMPANION_SIZE_SCALE, companionSize, performanceProfile, ui } from '$lib/stores/settings';
+  import { mediaService, nowPlaying } from '$lib/integrations/media';
+  import { isTauri } from '$lib/core/platform/tauri';
   import type { CompanionActivity } from '$lib/types';
+
+  /** Away for at least this long (no input, or window hidden) → the companion greets you on return. */
+  const AWAY_MS = 3 * 60_000;
 
   let host: HTMLDivElement;
   let hitbox: HTMLButtonElement;
@@ -30,8 +35,12 @@
     focus: 'keeping you company',
     'weather-react': 'watching the weather',
     explore: 'exploring',
+    greet: 'happy to see you',
+    dance: 'dancing to your music',
   };
 
+  // A boolean, so the 3-second media poll only touches the renderer when playback starts or stops.
+  const musicPlaying = $derived($nowPlaying.media?.status === 'playing');
   const definition = $derived(COMPANIONS[$activeThemeState.companion]);
   const label = $derived(
     `${definition.name}${$companionState ? `, ${ACTIVITY_LABELS[$companionState.activity]}` : ''}. Press to pet.`,
@@ -62,7 +71,34 @@
     const offFocus = on('focus:completed', (completion) => {
       if (completion.phase === 'focus') renderer?.celebrate();
     });
+
+    // Presence: notice when the user comes back after a while.
+    let lastSeen = Date.now();
+    let hiddenSince: number | null = null;
+    const seen = () => {
+      const now = Date.now();
+      if (now - lastSeen >= AWAY_MS) renderer?.greet();
+      lastSeen = now;
+    };
+    const onVisibility = () => {
+      if (document.visibilityState === 'hidden') hiddenSince = Date.now();
+      else if (hiddenSince !== null) {
+        if (Date.now() - hiddenSince >= AWAY_MS) lastSeen = 0; // greet on the next input
+        hiddenSince = null;
+      }
+    };
+    window.addEventListener('pointermove', seen, { passive: true });
+    window.addEventListener('keydown', seen);
+    document.addEventListener('visibilitychange', onVisibility);
+
+    // Music: the companion may dance while something plays (Windows media session).
+    const releaseMedia = isTauri() ? mediaService.acquire() : () => undefined;
+
     return () => {
+      window.removeEventListener('pointermove', seen);
+      window.removeEventListener('keydown', seen);
+      document.removeEventListener('visibilitychange', onVisibility);
+      releaseMedia();
       offFocus();
       renderer?.dispose();
       renderer = null;
@@ -101,6 +137,7 @@
       sleepMode: $ui.sleepMode,
       focusActive: $focusActive,
       companionVisible: $ui.companionVisible,
+      musicPlaying,
     });
   });
 </script>

@@ -23,6 +23,8 @@
     'celebrate',
     'focus',
     'weather-react',
+    'greet',
+    'dance',
   ];
 
   let host: HTMLDivElement;

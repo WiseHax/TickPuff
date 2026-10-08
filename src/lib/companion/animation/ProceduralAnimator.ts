@@ -189,6 +189,37 @@ export class ProceduralAnimator implements Animator {
       if (at >= 1.1) p.headPitch = -0.45;
       p.ear = -0.25;
     }
+    if (activity === 'greet' && !moving) {
+      // Happy little bounces, head tilted, ears up; arms / wings / flippers wave.
+      const bounce = Math.abs(Math.sin(at * 7));
+      p.bodyY += bounce * 0.12;
+      p.squash = 1 + (bounce - 0.5) * 0.06;
+      p.headRoll = Math.sin(at * 3.5) * 0.25;
+      p.headPitch = -0.12;
+      p.ear = 0.55;
+      p.eyeOpen = this.blinking > 0 ? 0.1 : 1.1;
+      p.tailYaw = Math.sin(t * 15) * 0.6;
+      p.armFlap = 0.9 + Math.sin(at * 12) * 0.45;
+      if (this.locomotion === 'quadruped') p.legs = [-0.5 + Math.sin(at * 10) * 0.35, 0, 0, 0];
+    }
+    if (activity === 'dance' && !moving) {
+      // Bop to a steady ~110 bpm beat: bounce, sway, head nods, alternating steps.
+      const beat = t * Math.PI * 1.85;
+      const bob = Math.abs(Math.sin(beat));
+      p.bodyY += bob * 0.07;
+      p.bodyRoll = Math.sin(beat) * 0.14;
+      p.squash = 1 - (1 - bob) * 0.05;
+      p.headRoll = -Math.sin(beat) * 0.2;
+      p.headPitch = Math.sin(beat * 2) * 0.08;
+      p.headYaw *= 0.3;
+      p.ear = 0.25 + bob * 0.3;
+      p.tailYaw = Math.sin(beat * 2) * 0.55;
+      p.armFlap = 0.4 + bob * 0.5;
+      p.armSwing = Math.sin(beat) * 0.4;
+      const step = Math.sin(beat) * 0.35;
+      if (this.locomotion === 'quadruped' || this.locomotion === 'hop') p.legs = [step, -step, -step * 0.5, step * 0.5];
+      if (this.locomotion === 'biped') p.legs = [Math.max(0, step), Math.max(0, -step), 0, 0];
+    }
     if (SLEEPY.includes(activity)) {
       p.eyeOpen = 0.08;
       p.glow = 0.25;

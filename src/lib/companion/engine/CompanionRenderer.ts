@@ -36,6 +36,8 @@ export interface WorldContext {
   sleepMode: boolean;
   focusActive: boolean;
   companionVisible: boolean;
+  /** Music is playing on the computer. */
+  musicPlaying?: boolean;
 }
 
 export interface RendererOptions {
@@ -85,6 +87,8 @@ const FACE_VIEWER: CompanionActivity[] = [
   'wake',
   'weather-react',
   'play',
+  'greet',
+  'dance',
 ];
 
 export class CompanionRenderer {
@@ -242,6 +246,11 @@ export class CompanionRenderer {
     }
   }
 
+  /** The user came back after being away. */
+  greet() {
+    this.behavior.greet();
+  }
+
   /** A focus session finished. */
   celebrate() {
     this.behavior.celebrate();
@@ -365,6 +374,7 @@ export class CompanionRenderer {
       weather: world.weather,
       sleepMode: world.sleepMode,
       focusActive: world.focusActive,
+      music: world.musicPlaying ?? false,
       hovered: this.interaction.hovered,
       arrived: this.arrived,
       position: this.mapper.toStage(this.navigator.position),

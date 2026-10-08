@@ -4,7 +4,7 @@
  * go; it knows nothing about three.js, so it is unit-tested directly.
  *
  * Priority, highest first:
- *   sleep mode → celebrate / react events → focus → hover → travel → free choice
+ *   sleep mode → celebrate / react / greet events → focus → hover → travel → free choice
  */
 import { randomBetween, weightedPick, type Random } from '$lib/core/math';
 import type { CompanionActivity, Personality, StageDefinition, StageZone, TimeOfDay, WeatherType } from '$lib/types';
@@ -28,6 +28,8 @@ export interface BehaviorContext {
   /** Reported by the navigator this frame. */
   arrived: boolean;
   position: { x: number; depth: number };
+  /** Music is playing on the computer (dancing becomes likely). */
+  music?: boolean;
 }
 
 export interface BehaviorOutput {
@@ -58,7 +60,7 @@ export class BehaviorController {
   private plan = 0;
   private zoneId: string | null = null;
   private afterArrival: { activity: CompanionActivity; duration: number } | null = null;
-  private pending: 'poke' | 'celebrate' | null = null;
+  private pending: 'poke' | 'celebrate' | 'greet' | null = null;
 
   constructor(
     private personality: Personality,
@@ -72,6 +74,11 @@ export class BehaviorController {
   /** The user clicked the companion. */
   poke() {
     if (this.pending !== 'celebrate') this.pending = 'poke';
+  }
+
+  /** The user came back after being away for a while. */
+  greet() {
+    if (this.pending === null) this.pending = 'greet';
   }
 
   /** A focus session completed. */
@@ -95,7 +102,7 @@ export class BehaviorController {
       destination: this.destination,
       pace: this.pace,
       plan: this.plan,
-      watchPointer: (ctx.hovered && this.activity === 'look') || this.activity === 'react',
+      watchPointer: (ctx.hovered && this.activity === 'look') || this.activity === 'react' || this.activity === 'greet',
       zoneId: this.zoneId,
     };
   }
@@ -124,13 +131,28 @@ export class BehaviorController {
       else this.start('react', 1.1, true);
       return;
     }
+    if (this.pending === 'greet') {
+      this.pending = null;
+      if (ctx.focusActive) {
+        // Don't break the user's focus; a small look is enough.
+      } else if (this.activity === 'sleep') {
+        this.start('wake', 1.6, true);
+      } else {
+        // Hurry to the front of the stage and say hello.
+        const { minX, maxX } = ctx.stage;
+        const x = Math.min(maxX, Math.max(minX, ctx.position.x));
+        this.start('idle', 0, true);
+        this.travel({ x, depth: 0.05, altitude: 0.35 }, 'run', { activity: 'greet', duration: 2.4 }, null);
+        return;
+      }
+    }
     if (this.activity === 'react' && this.remaining <= 0) {
       const playful = this.personality === 'playful' || this.personality === 'energetic';
       if (playful && this.random() < 0.6) this.start('play', randomBetween(this.random, 2.5, 4.5));
       else this.start('idle', 2);
       return;
     }
-    if (this.activity === 'celebrate' && this.remaining > 0) return;
+    if ((this.activity === 'celebrate' || this.activity === 'greet') && this.remaining > 0) return;
 
     // 3. Focus: settle down and keep the user company.
     if (ctx.focusActive) {
@@ -168,7 +190,13 @@ export class BehaviorController {
       return;
     }
 
-    // 6. Free choice when the current activity runs out.
+    // 6. The music stopped: stop dancing.
+    if (this.activity === 'dance' && !ctx.music) {
+      this.start('idle', 2);
+      return;
+    }
+
+    // 7. Free choice when the current activity runs out.
     if (this.remaining <= 0) this.chooseNext(ctx);
   }
 
@@ -232,6 +260,12 @@ export class BehaviorController {
       scale('play', 0.5);
       if (zones.some((zone) => zone.kind === 'shelter')) scale('visit', ctx.weather === 'heavy-rain' ? 4 : 2);
     }
+    if (ctx.music) {
+      const groovy = this.personality === 'playful' || this.personality === 'energetic';
+      w.dance = groovy ? 6 : 3.5;
+      scale('sleep', 0.3);
+      scale('sit', 0.6);
+    }
     if (zones.length === 0) delete w.visit;
     // Avoid repeating the exact same idle-ish activity back to back.
     if (this.activity === 'stretch') delete w.stretch;
@@ -287,6 +321,9 @@ export class BehaviorController {
         break;
       case 'weather-react':
         this.start('weather-react', 3);
+        break;
+      case 'dance':
+        this.start('dance', r(6, 11));
         break;
       default:
         this.start('idle', r(3, 7));

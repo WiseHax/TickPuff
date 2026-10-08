@@ -23,7 +23,11 @@ export type CompanionActivity =
   | 'celebrate'
   | 'focus'
   | 'weather-react'
-  | 'explore';
+  | 'explore'
+  /** Welcoming the user back after they were away. */
+  | 'greet'
+  /** Bopping along while music plays. */
+  | 'dance';
 
 export type Personality = 'calm' | 'playful' | 'curious' | 'energetic' | 'sleepy';
 
