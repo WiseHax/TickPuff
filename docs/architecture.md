@@ -124,6 +124,7 @@ Nothing polls unless something visible needs it:
 | AI detection | `integrations/ai` | AI widget mounted, window visible | 20 s |
 | System stats | `integrations/system` | System widget mounted, window visible | 3 s |
 | Media session | `integrations/media` | Now Playing widget mounted or the desktop app's companion layer (for dancing), window visible | 3 s |
+| Update check | `integrations/updater` | once, 20 s after startup (desktop release builds, if enabled) | once |
 | Weather | `integrations/weather` | Weather widget mounted or atmosphere sync on | 30 min |
 
 Integrations use `createPoller` (no overlapping runs, abortable, pauses when hidden) wrapped in

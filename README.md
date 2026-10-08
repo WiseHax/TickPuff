@@ -42,6 +42,7 @@ It is a clock first — not a dashboard, not a productivity suite.
 | **Now playing** *(Windows)* | The current media session from Windows, with play/pause and skip. |
 | **Ambient & sleep modes** | Hide everything but the world, or dim it and let the companion sleep. Full screen with <kbd>F11</kbd>. |
 | **Calm layout** | Widgets live in drawers that slide in from the edges (<kbd>W</kbd>) and stay out of the way otherwise; a small glance under the clock shows a running focus timer. Every widget can be turned on or off, placed left or right and reordered, and presets switch layouts in one click. |
+| **Updates** *(desktop)* | Signed in-app updates from GitHub releases; you choose when to install. |
 | **Mini mode & tray** *(desktop)* | A small always-on-top window in the corner with just the clock and companion, a tray menu, and optional start with Windows. |
 
 ### Honest status notes
@@ -114,9 +115,10 @@ Tauri 2. Read [docs/architecture.md](docs/architecture.md) for the details, and
 
 ## Privacy
 
-Everything you enter stays on your computer (in the app's local storage). TickPuff makes no network
-requests unless you choose a weather location — then it asks [Open-Meteo](https://open-meteo.com/) for that
-location's forecast. AI tool detection only reads the local process list and checks a few install folders;
+Everything you enter stays on your computer (in the app's local storage). The desktop app checks GitHub once
+at startup for a new version (Settings → About, can be turned off). Otherwise TickPuff makes no network requests
+unless you choose a weather location — then it asks [Open-Meteo](https://open-meteo.com/) for that location's
+forecast. AI tool detection only reads the local process list and checks a few install folders;
 it never launches anything or reads account data.
 
 ## Contributing

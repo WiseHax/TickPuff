@@ -6,6 +6,15 @@ All notable changes to TickPuff are documented here. The format follows
 
 ## [Unreleased]
 
+### Automatic updates (not released yet)
+
+- In-app updates: TickPuff checks GitHub for a new release a little after it starts and shows a small notice;
+  nothing is downloaded or installed until you press **Update**. Updates are signed and verified before
+  installing. Turn the startup check off, or check by hand, in Settings → About.
+- Release workflow: pushing a version tag builds the Windows installers and the signed update packages into a
+  draft GitHub release.
+- The privacy note in Settings now mentions the update check.
+
 ## [0.3.0] — a calmer layout, reactions, tray and mini mode
 
 ### Layout

@@ -74,6 +74,20 @@ anything timed, and `setStorageBackend(new MemoryBackend())` for persisted store
 
 1. Update the version in `package.json`, `src-tauri/Cargo.toml` and `src-tauri/tauri.conf.json`.
 2. Move "Unreleased" entries in `CHANGELOG.md` under the new version.
-3. `npm run verify`, the Rust checks, and `npm run tauri build`.
-4. Smoke-test the installer, tag `vX.Y.Z`, and attach the installers from
-   `src-tauri/target/release/bundle/` to a GitHub release.
+3. `npm run verify` and the Rust checks; smoke-test with `npm run tauri build`.
+4. Commit, then tag and push: `git tag -a vX.Y.Z -m "TickPuff X.Y.Z"` and `git push origin vX.Y.Z`.
+5. The **Release** workflow (`.github/workflows/release.yml`) builds the Windows installers, signs the update
+   packages and uploads everything — including `latest.json` for the updater — to a **draft** release.
+6. Check the draft and press **Publish release**. Installed copies find the update on their next start (or
+   Settings → About → Check for updates).
+
+### Update signing
+
+Updates are verified with a minisign key pair (this is not Windows code signing; SmartScreen still warns until
+the installer is code-signed). The public key is in `tauri.conf.json` under `plugins.updater`. The private key
+and its password live only with the maintainer and in the repository secrets `TAURI_SIGNING_PRIVATE_KEY` and
+`TAURI_SIGNING_PRIVATE_KEY_PASSWORD`. Never commit them. Losing the private key means installed copies can no
+longer be updated automatically.
+
+Local `npm run tauri build` does not produce update packages (they need the key); only the Release workflow
+does, via `src-tauri/tauri.release.conf.json`.
