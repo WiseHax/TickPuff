@@ -23,6 +23,10 @@ export interface BackendCommands {
   detect_ai_tools: { args: undefined; result: import('$lib/types').AIDetectionReport };
   media_current: { args: undefined; result: import('$lib/types').MediaInfo | null };
   media_control: { args: { action: import('$lib/types').MediaAction }; result: void };
+  mini_mode: { args: undefined; result: boolean };
+  set_mini_mode: { args: { enabled: boolean }; result: boolean };
+  autostart: { args: undefined; result: boolean };
+  set_autostart: { args: { enabled: boolean }; result: boolean };
 }
 
 export async function invokeCommand<K extends keyof BackendCommands>(

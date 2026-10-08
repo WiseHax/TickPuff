@@ -2,3 +2,4 @@
 
 pub mod ai_detect;
 pub mod system_monitor;
+pub mod window_modes;

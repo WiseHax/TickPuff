@@ -2,6 +2,11 @@
   import { PERFORMANCE_DESCRIPTIONS, performanceMode } from '$lib/stores/settings';
   import { rendererStatus } from '$lib/companion/status';
   import { PERFORMANCE_MODES } from '$lib/types';
+  import Switch from '$lib/components/ui/Switch.svelte';
+  import { autostart, initWindowModes, setAutostart } from '$lib/stores/windowMode';
+  import { onMount } from 'svelte';
+
+  onMount(() => void initWindowModes());
 
   const NAMES = { ECO: 'Eco', BALANCED: 'Balanced', BEAUTIFUL: 'Beautiful' } as const;
 </script>
@@ -21,8 +26,14 @@
 </div>
 <p class="hint">
   In every mode, rendering pauses while the window is hidden or minimized and slows down while the companion sleeps.
-  Background checks (AI tools, system stats, media) only run while their widget is visible.
+  Background checks for AI tools and system stats only run while their widget is open. The desktop app checks the media
+  session every few seconds so the companion can dance to your music.
 </p>
+{#if $autostart !== null}
+  <h3 class="section-title">Startup</h3>
+  <Switch label="Start TickPuff when you sign in" checked={$autostart} onchange={(value) => setAutostart(value)} />
+  <p class="hint">TickPuff also lives in the system tray: show it, switch to mini mode or quit from there.</p>
+{/if}
 <p class="hint">
   3D renderer: {$rendererStatus === 'running'
     ? 'running'
