@@ -77,17 +77,33 @@ object** — a "campfire" zone needs a campfire in the scene.
 
 ## Scenery components
 
-A scene receives `time` (the current `TimeOfDay`) and renders three parallax layers:
+A scene receives `time` (the current `TimeOfDay`) and renders a stack of parallax layers, far to near:
 
 ```svelte
-<div class="world-layer" style="--depth: 10"> sky, sun/moon, far hills </div>
+<Sky {time} seed={1} sunX={0.7} />  <!-- shared sky: glow, sun/moon, stars, clouds -->
+<div class="world-layer" style="--depth: 6"> mountains </div>
 <div class="world-layer" style="--depth: 20"> midground </div>
-<div class="world-layer" style="--depth: 40"> foreground and ground </div>
+<div class="world-layer" style="--depth: 40"> ground, props, framing </div>
 ```
 
 `--depth` is the parallax strength in pixels; `World.svelte` drives it from the pointer (disabled in Eco mode).
-Keep scenery as SVG/CSS — it's cheap to render and scales cleanly. Don't put weather in scenes: atmosphere is
-rendered by the effects layer.
+
+Scenery is SVG drawn in a 1600 × 900 space with `preserveAspectRatio="xMidYMax slice"`, so it stays anchored
+to the bottom of the window. `scenes/art.ts` has deterministic generators — `ridge`, `mountains` (with snow
+caps), `pineRow`, `canopy`, `grass`, `specks`, `starField`, `clouds` — and `mix()` for colours derived from the
+theme's CSS variables (`TOP`, `BOTTOM`, `ACCENT`), so a scene follows every time of day without its own palette.
+`GROUND_Y` is where the walkable stage sits.
+
+Rules that keep scenery cheap:
+
+- Generate geometry once (top-level `const` in the component), never per frame.
+- Animate only whole elements (`transform` / `opacity` on an HTML element or a small standalone `<svg>`), never
+  shapes inside a full-screen SVG — that repaints the whole layer every frame.
+- Props that the companion visits (a zone's mushroom, candle, lantern) are absolutely positioned in % of the
+  window so they line up with the stage at any aspect ratio.
+- Don't put weather in scenes: atmosphere is rendered by the effects layer.
+
+In development, preview any time of day with `?time=night` (or `morning`, `day`, `sunset`, `late-night`).
 
 ## Checklist for changes to a world
 

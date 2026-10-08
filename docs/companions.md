@@ -40,14 +40,30 @@ fox: {
 
 ### Procedural models (current)
 
-All companions currently use procedural models from `companion/models/procedural/`, built at runtime from
-smooth primitives (`models/parts.ts`) with a shared three-step toon ramp. **They are placeholders**: designed to
-be recognizable and expressive, but not final art.
+All companions use procedural models from `companion/models/procedural/`, built at runtime from smooth
+primitives in `models/parts.ts`:
+
+- `ellipsoid`, `sphere`, `limb`, `taperedLimb`, `softCone` (ears, tufts, beaks), `torus`, `cylinder`,
+  `roundedBox` and the shaded `mesh` helper for custom geometry;
+- `eye` (rim, iris, pupil and two catch-lights), `blush`, `paw` (with optional toe beans).
+
+The shared look:
+
+- `toon(color)` — a four-step cel ramp plus a rim light. Toon materials use **vertex colours** for painted
+  top-to-bottom shading, so always build meshes through the helpers (or `mesh()`), never `new THREE.Mesh`
+  with a raw geometry — it would render black.
+- `addOutlines(root, color)` — an inverted-hull ink outline for every opaque mesh. `buildProcedural` applies it
+  with each model's outline colour. Wrap small details (eyes, noses, markings) in `detail()` to skip them.
+- `companionLook` — uniforms shared by every companion (rim colour and strength, outline width). The renderer
+  sets them from the world's colours and the window size.
+
+The models are hand-built from code, not sculpted art; GLB models can replace them (below).
 
 Each builder returns a `CompanionRig` (`models/rig.ts`): `root`, `body`, `head`, and optional `tail`,
 `tailSegments`, `ears`, `legs`, `arms`, `eyes`, `spinners`, `tentacles`, `glows`. Conventions:
 
-- facing +Z, feet at y = 0, about 1.6 units tall;
+- facing +Z, feet at y = 0, about 1.6 units tall (the renderer multiplies this by the definition's `scale` and
+  the user's **Size** setting: 1.3×, 1.75× or 2.2×);
 - each part's pivot is where it rotates (legs hang down from the hip, ears rise from their base);
 - `body.userData.restY` is the body's resting height;
 - `eyes` are scaled on Y to blink; `glows` are dimmed while sleeping.

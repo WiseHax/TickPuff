@@ -6,6 +6,34 @@ All notable changes to TickPuff are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.2.0] — detailed companions and redrawn worlds
+
+### Companions
+
+- Every companion rebuilt with far more detail: big glossy eyes with irises and catch-lights, blush, noses,
+  paws with toe beans, cheek and chest fluff, a brush tail for the fox, a collar and bell for the cat, scarves
+  for the bear and penguin, feathered chests and ear tufts for the owl, koi patterns and flowing fins,
+  hexagonal turtle scutes, a screen face for the robot and a camera eye with rotor guards for the drone.
+- New look: four-step cel shading, painted top-to-bottom shading, a rim light that follows the world's sky and
+  accent colour, and ink outlines that stay the same width at any size.
+- Companions are much bigger on screen, with a new **Size** setting (Small / Medium / Large, default Large).
+
+### Worlds
+
+- All five worlds redrawn as layered, parallax illustrations that follow the time of day: a shared sky with a
+  sun or moon on an arc, twinkling stars and drifting clouds.
+  - **Cozy Forest**: snow-capped peaks, three depths of pine forest, drifting fog, a flowery clearing with mossy
+    boulders, a footpath, glowing mushrooms and a lantern at night.
+  - **Sakura Dream**: a snowy volcano, blossom groves, a pagoda with lit windows, a torii gate, stepping stones,
+    a great cherry tree and a stone lantern.
+  - **Deep Aquarium**: shimmering surface and light rays, a rock arch, swaying kelp, branching corals that glow
+    at night, sea grass, rippled sand, a starfish and glowing plankton.
+  - **Cyber City**: two depths of skyline with lit windows, vertical neon signs, a billboard, flying-car light
+    trails, a wet rooftop with neon reflections, a water tank and a flickering ramen sign.
+  - **Magic Library**: an arched window onto the town and sky, curtains, full bookcases, a rug, a plant, a
+    globe, a hanging lamp and a candle.
+- Scenery animations run on the compositor, pause in Eco mode and respect the system's reduced-motion setting.
+
 ## [0.1.0] — first open-source release
 
 The first public version: the prototype restructured into a maintainable, tested codebase.

@@ -22,13 +22,18 @@ It is a clock first — not a dashboard, not a productivity suite.
 
 ![TickPuff in the Cozy Forest world at night](docs/screenshots/forest-night.png)
 
+| | |
+| --- | --- |
+| ![Sakura Dream by day](docs/screenshots/sakura-day.png) | ![Deep Aquarium at night](docs/screenshots/aquarium-night.png) |
+| ![Cyber City at night](docs/screenshots/cyberpunk-night.png) | ![Magic Library at sunset](docs/screenshots/library-sunset.png) |
+
 ## Features
 
 | | |
 | --- | --- |
 | **Clock** | Large customizable clock and date: five bundled fonts (or the world's own), size, weight, spacing, colour, seconds, 12/24-hour. |
 | **Worlds** | Five themed worlds — Cozy Forest, Sakura Dream, Deep Aquarium, Cyber City, Magic Library — whose colours follow the time of day. Each world remembers its own companion and atmosphere. |
-| **3D companion** | A companion that roams the world, visits spots like the pine tree or the candle, sleeps, stretches, plays, looks at your cursor and celebrates finished focus sessions. Eleven companions across the worlds. |
+| **3D companion** | A companion that roams the world, visits spots like the pine tree or the candle, sleeps, stretches, plays, looks at your cursor and celebrates finished focus sessions. Eleven detailed, cel-shaded companions across the worlds, in three sizes. |
 | **Atmosphere** | GPU particle rain, snow, petals, leaves, bubbles, dust, fireflies and sparks, plus soft fog. Optionally follows your real local weather. |
 | **Focus** | Pomodoro timer with short and long breaks, custom durations, auto-start, a chime and a daily streak. Timestamp-based, so it never drifts. |
 | **Tasks, notes, countdown, calendar, daily summary** | Small local tools, each an independent widget. |
@@ -40,9 +45,9 @@ It is a clock first — not a dashboard, not a productivity suite.
 
 ### Honest status notes
 
-- **Companion models are procedural placeholders.** They are built at runtime from simple shapes with
-  toon shading. They are recognizable and fully animated, but they are not final art. The engine already
-  loads GLB/GLTF models — see [docs/companions.md](docs/companions.md).
+- **Companion models are procedural.** They are built at runtime from code (cel shading, ink outlines,
+  detailed faces), not sculpted 3D art. The engine already loads GLB/GLTF models — see
+  [docs/companions.md](docs/companions.md).
 - **Quota is not shown for AI tools.** Neither Antigravity nor Claude Code provides a supported way for
   other apps to read usage or quota, so TickPuff shows "not available" rather than guessing.
 - **Windows is the only tested platform.** See [supported platforms](#supported-platforms).

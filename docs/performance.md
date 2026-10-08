@@ -29,7 +29,10 @@ the same position.
 - **Atmosphere fallback** — fog is always CSS (a gradient); in Eco mode rain, snow and fireflies are a handful of
   CSS layers, never one element per particle.
 - **Parallax** — pointer movement writes two CSS variables at most once per animation frame; no component
-  re-renders.
+  re-renders. In Eco mode the layers drop their GPU surfaces and the scenery's own animations pause.
+- **Scenery** — static SVG generated once per world. Moving parts (clouds, star groups, kelp, fog, lights) are
+  separate elements animated with `transform`/`opacity` on the compositor; all of it pauses under the
+  system's reduced-motion setting.
 - **Polling** — integrations poll only while their widget is mounted and pause while the window is hidden (see
   the table in [architecture.md](architecture.md#recurring-work-and-lifecycles)).
 - **Clock** — one timer aligned to wall-clock seconds.
