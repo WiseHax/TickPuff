@@ -24,6 +24,8 @@ const ACTIVITIES: CompanionActivity[] = [
   'celebrate',
   'focus',
   'weather-react',
+  'greet',
+  'dance',
   'explore',
 ];
 

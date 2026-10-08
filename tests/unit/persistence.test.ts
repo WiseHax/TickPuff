@@ -153,3 +153,29 @@ describe('persisted store', () => {
     expect(loadPersisted(spec, backend)).toEqual({ size: 1, name: 'default' });
   });
 });
+
+describe('UI settings migration', () => {
+  it('closes the widget drawers once when upgrading from v1, keeping other choices', async () => {
+    const { uiSpec } = await import('$lib/stores/settings');
+    backend.setItem(
+      'tickpuff-ui',
+      JSON.stringify({
+        v: 1,
+        data: { sleepMode: false, ambientMode: true, widgetsVisible: true, companionVisible: false },
+      }),
+    );
+    expect(loadPersisted(uiSpec, backend)).toEqual({
+      sleepMode: false,
+      ambientMode: true,
+      widgetsVisible: false,
+      companionVisible: false,
+    });
+    // After the upgrade, the user's own choice to open the drawers is respected.
+    savePersisted(
+      uiSpec,
+      { sleepMode: false, ambientMode: false, widgetsVisible: true, companionVisible: true },
+      backend,
+    );
+    expect(loadPersisted(uiSpec, backend).widgetsVisible).toBe(true);
+  });
+});

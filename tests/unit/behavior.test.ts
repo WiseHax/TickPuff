@@ -125,3 +125,41 @@ describe('companion behavior', () => {
     expect(count('late-night')).toBeGreaterThan(count('day'));
   });
 });
+
+describe('companion reactions', () => {
+  it('runs to the front of the stage and greets a returning user', () => {
+    const controller = new BehaviorController('calm', seededRandom(3));
+    run(controller, 5);
+    controller.greet();
+    const first = controller.update(0.1, context());
+    expect(first.activity).toBe('run');
+    expect(first.destination?.depth).toBeCloseTo(0.05);
+    const arrivedOut = controller.update(0.1, context({ arrived: true }));
+    expect(arrivedOut.activity).toBe('greet');
+    expect(arrivedOut.watchPointer).toBe(true);
+  });
+
+  it('does not interrupt focus to greet', () => {
+    const controller = new BehaviorController('calm', seededRandom(3));
+    run(controller, 2, { focusActive: true });
+    controller.greet();
+    expect(controller.update(0.1, context({ focusActive: true })).activity).toBe('focus');
+  });
+
+  it('dances while music plays and stops when it ends', () => {
+    const controller = new BehaviorController('playful', seededRandom(11));
+    const withMusic = run(controller, 240, { music: true }).map((o) => o.activity);
+    const withoutMusic = run(new BehaviorController('playful', seededRandom(11)), 240).map((o) => o.activity);
+    expect(withMusic).toContain('dance');
+    expect(withoutMusic).not.toContain('dance');
+
+    // Find a moment it is dancing, then silence the music.
+    const dancer = new BehaviorController('playful', seededRandom(11));
+    let out = dancer.update(0.1, context({ music: true }));
+    for (let i = 0; i < 5000 && out.activity !== 'dance'; i++) {
+      out = dancer.update(0.1, context({ music: true, arrived: out.destination !== null }));
+    }
+    expect(out.activity).toBe('dance');
+    expect(dancer.update(0.1, context({ music: false })).activity).toBe('idle');
+  });
+});
