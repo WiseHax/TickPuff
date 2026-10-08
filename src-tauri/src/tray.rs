@@ -19,17 +19,16 @@ pub fn create(app: &App) -> tauri::Result<()> {
         None::<&str>,
     )?;
     let quit = MenuItem::with_id(handle, "quit", "Quit TickPuff", true, None::<&str>)?;
-    let menu = Menu::with_items(
-        handle,
-        &[
-            &show,
-            &PredefinedMenuItem::separator(handle)?,
-            &mini,
-            &autostart,
-            &PredefinedMenuItem::separator(handle)?,
-            &quit,
-        ],
-    )?;
+    let separator_top = PredefinedMenuItem::separator(handle)?;
+    let separator_bottom = PredefinedMenuItem::separator(handle)?;
+    // The Store package starts with Windows through its own startup task (Windows Settings).
+    let mut items: Vec<&dyn tauri::menu::IsMenuItem<tauri::Wry>> = vec![&show, &separator_top, &mini];
+    if !crate::STORE_BUILD {
+        items.push(&autostart);
+    }
+    items.push(&separator_bottom);
+    items.push(&quit);
+    let menu = Menu::with_items(handle, &items)?;
     app.manage(TrayChecks { mini, autostart });
 
     let mut builder = TrayIconBuilder::with_id("main")

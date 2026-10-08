@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Microsoft Store package manifest. `npm run build:msix` fills in {{VERSION}}.
+  Identity values come from Partner Center → TickPuff → Product identity.
+-->
+<Package
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  xmlns:desktop="http://schemas.microsoft.com/appx/manifest/desktop/windows10"
+  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+  IgnorableNamespaces="uap desktop rescap">
+  <Identity
+    Name="WiseHax.TickPuff"
+    Publisher="CN=0C8D9496-BFD2-423A-87B8-0A2992126750"
+    Version="{{VERSION}}"
+    ProcessorArchitecture="x64" />
+  <Properties>
+    <DisplayName>TickPuff</DisplayName>
+    <PublisherDisplayName>WiseHax</PublisherDisplayName>
+    <Logo>Assets\StoreLogo.png</Logo>
+    <Description>A calm desktop clock with a living world and a 3D companion.</Description>
+  </Properties>
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.19041.0" MaxVersionTested="10.0.26100.0" />
+  </Dependencies>
+  <Resources>
+    <Resource Language="en-us" />
+  </Resources>
+  <Applications>
+    <Application Id="TickPuff" Executable="tickpuff.exe" EntryPoint="Windows.FullTrustApplication">
+      <uap:VisualElements
+        DisplayName="TickPuff"
+        Description="A calm desktop clock with a living world and a 3D companion."
+        BackgroundColor="transparent"
+        Square150x150Logo="Assets\Square150x150Logo.png"
+        Square44x44Logo="Assets\Square44x44Logo.png" />
+      <Extensions>
+        <!-- "Start with Windows": the user turns it on in Windows Settings → Apps → Startup. -->
+        <desktop:Extension Category="windows.startupTask" Executable="tickpuff.exe" EntryPoint="Windows.FullTrustApplication">
+          <desktop:StartupTask TaskId="TickPuffStartup" Enabled="false" DisplayName="TickPuff" />
+        </desktop:Extension>
+      </Extensions>
+    </Application>
+  </Applications>
+  <Capabilities>
+    <Capability Name="internetClient" />
+    <rescap:Capability Name="runFullTrust" />
+  </Capabilities>
+</Package>

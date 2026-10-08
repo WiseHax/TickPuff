@@ -29,7 +29,10 @@
   Background checks for AI tools and system stats only run while their widget is open. The desktop app checks the media
   session every few seconds so the companion can dance to your music.
 </p>
-{#if $autostart !== null}
+{#if __STORE_BUILD__}
+  <h3 class="section-title">Startup</h3>
+  <p class="hint">To start TickPuff when you sign in, turn it on in Windows Settings → Apps → Startup.</p>
+{:else if $autostart !== null}
   <h3 class="section-title">Startup</h3>
   <Switch label="Start TickPuff when you sign in" checked={$autostart} onchange={(value) => setAutostart(value)} />
   <p class="hint">TickPuff also lives in the system tray: show it, switch to mini mode or quit from there.</p>

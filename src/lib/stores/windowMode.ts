@@ -22,7 +22,7 @@ export async function initWindowModes(): Promise<void> {
   const { listen } = await import('@tauri-apps/api/event');
   await listen<boolean>(MINI_MODE_EVENT, (event) => miniMode.set(event.payload));
   miniMode.set(await invokeCommand('mini_mode'));
-  autostart.set(await invokeCommand('autostart'));
+  if (!__STORE_BUILD__) autostart.set(await invokeCommand('autostart'));
 }
 
 export async function setMiniMode(enabled: boolean): Promise<void> {

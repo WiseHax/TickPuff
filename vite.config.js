@@ -15,6 +15,8 @@ export default defineConfig({
   },
   define: {
     __APP_VERSION__: JSON.stringify(version),
+    // Microsoft Store build (`npm run build:msix`): the Store updates the app and manages startup.
+    __STORE_BUILD__: JSON.stringify(process.env.TICKPUFF_STORE === '1'),
   },
 
   // Options for `tauri dev` / `tauri build`:
