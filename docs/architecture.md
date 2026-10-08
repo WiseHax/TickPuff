@@ -8,7 +8,7 @@ Rust backend provides the few things a web page can't do (process detection, sys
 ┌──────────────────────────── WebView (SvelteKit SPA) ───────────────────────────┐
 │  World (2D scenery, CSS)  ←  theme definitions                                 │
 │  Companion layer (three.js canvas)  ←  companion engine + GPU effects          │
-│  Clock / widget docks / settings  ←  stores  ←  features & integrations        │
+│  Clock / widget drawers / settings  ←  stores  ←  features & integrations        │
 └───────────────────────────────┬────────────────────────────────────────────────┘
                                 │ invoke() — 4 narrow commands
 ┌───────────────────────────────┴────────────── Rust (Tauri) ────────────────────┐
@@ -24,7 +24,7 @@ These stay separate on purpose; most design decisions follow from them.
 | --- | --- | --- |
 | **Theme** | A visual world: colours per time of day, 2D scenery, allowed atmosphere effects, available companions, the stage the companion roams | A container for widgets or data |
 | **Companion** | The character: model, animation, behavior, movement | Aware of widgets, except through events like "focus completed" |
-| **Widget** | A tool in a dock (focus, tasks, AI, …); works in every theme | Responsible for fetching its own data |
+| **Widget** | A tool in a drawer (focus, tasks, AI, …); works in every theme | Responsible for fetching its own data |
 | **Preset** | A named widget layout | A theme |
 | **Integration** | A data source (backend command or web API) with explicit unavailable/error states | Allowed to guess or fake values |
 | **Performance** | A rendering policy (frame caps, particle density, pixel ratio) | Theme- or widget-specific |
@@ -123,7 +123,7 @@ Nothing polls unless something visible needs it:
 | Focus ticker | `stores/focus.ts` | a phase is running | 4×/s (display only; time is timestamp-based) |
 | AI detection | `integrations/ai` | AI widget mounted, window visible | 20 s |
 | System stats | `integrations/system` | System widget mounted, window visible | 3 s |
-| Media session | `integrations/media` | Now Playing widget mounted, window visible | 3 s |
+| Media session | `integrations/media` | Now Playing widget mounted or the desktop app's companion layer (for dancing), window visible | 3 s |
 | Weather | `integrations/weather` | Weather widget mounted or atmosphere sync on | 30 min |
 
 Integrations use `createPoller` (no overlapping runs, abortable, pauses when hidden) wrapped in
@@ -158,6 +158,8 @@ Rust commands are deliberately narrow:
 | `detect_ai_tools` | Scans process names/paths and checks a few known install locations |
 | `media_current` | Reads the current Windows media session (title, artist, app, capabilities) |
 | `media_control` | `play-pause`, `next` or `previous` — nothing else is accepted |
+| `mini_mode` / `set_mini_mode` | Read or toggle the always-on-top mini window (also in the tray menu) |
+| `autostart` / `set_autostart` | Read or toggle start with Windows (`tauri-plugin-autostart`) |
 
 Commands run their work on Tauri's blocking thread pool. There's no shell plugin and no generic process or file
 access. The capability file grants only window controls and opening two HTTPS origins; the CSP limits network

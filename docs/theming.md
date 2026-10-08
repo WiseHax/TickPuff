@@ -52,7 +52,7 @@ The ground band's position on screen is fixed (`GROUND_FRONT` / `GROUND_BACK` in
 
 ```ts
 stage: {
-  minX: 0.36,          // keep clear of the left widget dock
+  minX: 0.36,          // keep clear of the left widget drawer
   maxX: 0.84,
   medium: 'ground',    // or 'water' (swimmers use their altitude range)
   zones: [

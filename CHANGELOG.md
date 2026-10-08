@@ -6,6 +6,32 @@ All notable changes to TickPuff are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.3.0] — a calmer layout, reactions, tray and mini mode
+
+### Layout
+
+- Widgets now live in drawers that slide in from the edges of the window instead of floating panels, so the
+  clock, the world and the companion are all you see by default. Open them with the widgets button or
+  <kbd>W</kbd>; close them with <kbd>Esc</kbd> or a click on the world. Existing installs start with the drawers
+  closed once after updating.
+- A small glance chip under the clock shows a running focus or break phase (click to pause / resume), so there is
+  no need to open the drawers for it.
+- Lighter, borderless widget cards.
+
+### Companion
+
+- Greets you when you come back after three minutes or more away: it runs to the front of the stage and bounces
+  happily (or wakes up if it was napping). It never interrupts a focus session.
+- Dances while music plays on the computer (Windows media session); playful and energetic companions dance the
+  most. It stops when the music does.
+
+### Desktop
+
+- System tray icon: show TickPuff, mini mode, start with Windows, quit.
+- Mini mode: a small always-on-top window in the corner of the screen with just the clock and the companion.
+  Leaving it restores the previous size and position.
+- Start with Windows, from the tray or Settings → Performance → Startup (off by default).
+
 ## [0.2.0] — detailed companions and redrawn worlds
 
 ### Companions

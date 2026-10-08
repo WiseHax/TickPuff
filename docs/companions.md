@@ -100,15 +100,17 @@ Priority, highest first:
 
 1. **Sleep mode** — sleep in place; wake up (yawn) when it ends.
 2. **Events** — `poke()` (the user clicked or pressed Enter on the companion) → `react`, sometimes `play`;
-   `celebrate()` (a focus session finished) → `celebrate`.
+   `celebrate()` (a focus session finished) → `celebrate`; `greet()` (the user is back after 3+ minutes away)
+   → run to the front of the stage and `greet` (or `wake` if napping; ignored during focus).
 3. **Focus** — while a focus phase runs, sit quietly (`focus`); stretch afterwards.
 4. **Hover** — stop and watch the pointer (`look`).
 5. **Travel** — walk or run to the destination; on arrival do the zone's activity for its stay time.
 6. **Free choice** — when the current activity ends, pick the next one with personality weights adjusted for
-   time of day (sleepier at night) and weather (`weather-react` and shelter-seeking in rain or snow).
+   time of day (sleepier at night), weather (`weather-react` and shelter-seeking in rain or snow) and music
+   (`dance` while the Windows media session is playing; it stops when the music does).
 
 Activities: `idle`, `walk`, `run`, `sit`, `sleep`, `wake`, `stretch`, `look`, `react`, `play`, `celebrate`,
-`focus`, `weather-react`, `explore`.
+`focus`, `weather-react`, `explore`, `greet`, `dance`.
 
 ## Movement
 

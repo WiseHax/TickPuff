@@ -33,7 +33,7 @@ It is a clock first — not a dashboard, not a productivity suite.
 | --- | --- |
 | **Clock** | Large customizable clock and date: five bundled fonts (or the world's own), size, weight, spacing, colour, seconds, 12/24-hour. |
 | **Worlds** | Five themed worlds — Cozy Forest, Sakura Dream, Deep Aquarium, Cyber City, Magic Library — whose colours follow the time of day. Each world remembers its own companion and atmosphere. |
-| **3D companion** | A companion that roams the world, visits spots like the pine tree or the candle, sleeps, stretches, plays, looks at your cursor and celebrates finished focus sessions. Eleven detailed, cel-shaded companions across the worlds, in three sizes. |
+| **3D companion** | A companion that roams the world, visits spots like the pine tree or the candle, sleeps, stretches, plays, looks at your cursor, celebrates finished focus sessions, greets you when you come back and dances to your music. Eleven detailed, cel-shaded companions across the worlds, in three sizes. |
 | **Atmosphere** | GPU particle rain, snow, petals, leaves, bubbles, dust, fireflies and sparks, plus soft fog. Optionally follows your real local weather. |
 | **Focus** | Pomodoro timer with short and long breaks, custom durations, auto-start, a chime and a daily streak. Timestamp-based, so it never drifts. |
 | **Tasks, notes, countdown, calendar, daily summary** | Small local tools, each an independent widget. |
@@ -41,7 +41,8 @@ It is a clock first — not a dashboard, not a productivity suite.
 | **System monitor** | Real CPU and memory use; GPU utilisation on Windows. |
 | **Now playing** *(Windows)* | The current media session from Windows, with play/pause and skip. |
 | **Ambient & sleep modes** | Hide everything but the world, or dim it and let the companion sleep. Full screen with <kbd>F11</kbd>. |
-| **Presets & layout** | Every widget can be turned on or off, placed in the left or right dock and reordered. Presets switch layouts in one click. |
+| **Calm layout** | Widgets live in drawers that slide in from the edges (<kbd>W</kbd>) and stay out of the way otherwise; a small glance under the clock shows a running focus timer. Every widget can be turned on or off, placed left or right and reordered, and presets switch layouts in one click. |
+| **Mini mode & tray** *(desktop)* | A small always-on-top window in the corner with just the clock and companion, a tray menu, and optional start with Windows. |
 
 ### Honest status notes
 
@@ -101,7 +102,7 @@ TickPuff keeps a few concepts strictly apart:
 | --- | --- | --- |
 | **Theme** | A visual world: colours, scenery, allowed atmosphere, companions, roaming stage | `src/lib/themes` |
 | **Companion** | The living character: model, animation, behavior, movement | `src/lib/companion` |
-| **Widget** | A functional tool shown in a dock | `src/lib/components/widgets` |
+| **Widget** | A functional tool shown in a drawer | `src/lib/components/widgets` |
 | **Preset** | A named widget layout | `src/lib/stores/widgets.ts` |
 | **Integration** | An external or local data source | `src/lib/integrations`, `src-tauri/src` |
 | **Performance** | Rendering and resource policy (Eco / Balanced / Beautiful) | `src/lib/stores/settings.ts` |

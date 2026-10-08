@@ -1,6 +1,6 @@
 {
   "name": "tickpuff",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "private": true,
   "description": "A lightweight ambient desktop clock with a living 3D companion.",
   "license": "MIT",
