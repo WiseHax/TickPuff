@@ -14,8 +14,9 @@
 
 <style>
   .widget {
-    background: rgba(10, 10, 10, 0.25);
-    border-color: rgba(255, 255, 255, 0.05);
+    background: rgba(255, 255, 255, 0.06);
+    border-color: transparent;
+    border-radius: 16px;
     padding: 1.1rem 1.2rem;
     display: flex;
     flex-direction: column;
@@ -25,8 +26,7 @@
       border-color 0.3s;
   }
   .widget:hover {
-    background: rgba(10, 10, 10, 0.4);
-    border-color: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.1);
   }
   header {
     display: flex;

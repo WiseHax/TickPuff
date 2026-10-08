@@ -55,7 +55,7 @@ export interface UIState {
   sleepMode: boolean;
   /** Only the world and the companion; no clock or widgets. */
   ambientMode: boolean;
-  /** Widgets docks visible. */
+  /** Widget drawers open. */
   widgetsVisible: boolean;
   /** Show the 3D companion at all. */
   companionVisible: boolean;

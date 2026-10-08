@@ -128,13 +128,15 @@ export const companionSize = persisted(companionSizeSpec);
 export const DEFAULT_UI: UIState = {
   sleepMode: false,
   ambientMode: false,
-  widgetsVisible: true,
+  widgetsVisible: false,
   companionVisible: true,
 };
 
 export const uiSpec: PersistSpec<UIState> = {
   key: 'tickpuff-ui',
-  version: 1,
+  // v2: widgets moved into drawers that start closed, so the world is the first thing you see.
+  version: 2,
+  migrate: (raw, from) => (from < 2 && isRecord(raw) ? { ...raw, widgetsVisible: false } : raw),
   defaults: () => ({ ...DEFAULT_UI }),
   sanitize: (raw) =>
     isRecord(raw)
