@@ -1,7 +1,8 @@
 # Microsoft Store listing
 
 Copy these into Partner Center → TickPuff → Submit your product → Store listings (English).
-Screenshots are in `docs/store/` (1366 × 768, five worlds).
+Screenshots are in `docs/store/` (1366 × 768, five worlds). Store logos are in `docs/store/logos/`:
+9:16 poster art (720 × 1080), 1:1 box art (1080 × 1080) and the 1:1 app tile icon (300 × 300).
 
 ## Product name
 
@@ -60,6 +61,18 @@ clock, desktop clock, pomodoro, focus timer, cozy, virtual pet, ambient
 - Privacy policy: https://github.com/WiseHax/TickPuff/blob/main/PRIVACY.md
 - Website: https://github.com/WiseHax/TickPuff
 - Support contact: https://github.com/WiseHax/TickPuff/issues
+
+## Store listing extras
+
+- Copyright and trademark info: © 2026 WiseHax. TickPuff is open source under the MIT License.
+- Developed by: WiseHax
+
+## Certification notes (runFullTrust)
+
+TickPuff is a desktop app built with Tauri (Rust + WebView2), not a UWP app. runFullTrust is required to run the
+desktop executable. It is used for: a frameless window with an always-on-top mini mode, a system tray icon,
+reading the current Windows media session to show "Now playing", and reading local CPU/memory/GPU usage for an
+optional widget. It does not access user files, run other programs, or require admin rights.
 
 ## Age rating hints
 
