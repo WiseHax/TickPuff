@@ -37,3 +37,10 @@ desktop.ini
 
 # Local agent tooling
 /.claude
+
+# Accidental literal "~" folders (e.g. a key generated with -w ~/...)
+/~/
+
+# Microsoft Store packages (build output)
+packaging/msix/*.msix
+packaging/msix/stage/

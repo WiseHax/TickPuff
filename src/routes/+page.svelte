@@ -12,6 +12,10 @@
   import { focusActive } from '$lib/stores/focus';
   import { closeSettings, settingsPanel } from '$lib/stores/panel';
   import { initWindowModes, miniMode } from '$lib/stores/windowMode';
+  import UpdateNotice from '$lib/components/ui/UpdateNotice.svelte';
+  import { scheduleStartupCheck } from '$lib/integrations/updater';
+  import { autoUpdateCheck } from '$lib/stores/settings';
+  import { get } from 'svelte/store';
   import { isFullscreen, setFullscreen, toggleFullscreen } from '$lib/core/platform/window';
 
   /** Hide the controls after a few seconds without pointer or keyboard activity. */
@@ -65,6 +69,7 @@
   onMount(() => {
     wake();
     void initWindowModes();
+    if (!__STORE_BUILD__ && get(autoUpdateCheck)) scheduleStartupCheck();
     void isFullscreen().then((value) => (fullscreen = value));
     const onFullscreenChange = () => (fullscreen = document.fullscreenElement !== null);
     document.addEventListener('fullscreenchange', onFullscreenChange);
@@ -108,6 +113,10 @@
 
   {#if $settingsPanel.open}
     <SettingsPanel />
+  {/if}
+
+  {#if !$miniMode && !__STORE_BUILD__}
+    <UpdateNotice />
   {/if}
 </main>
 

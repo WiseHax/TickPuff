@@ -12,9 +12,17 @@
     "core:window:allow-close",
     "core:window:allow-set-fullscreen",
     "core:window:allow-is-fullscreen",
+    "updater:default",
     {
       "identifier": "opener:allow-open-url",
-      "allow": [{ "url": "https://github.com/WiseHax/TickPuff*" }, { "url": "https://open-meteo.com*" }]
+      "allow": [
+        {
+          "url": "https://github.com/WiseHax/TickPuff*"
+        },
+        {
+          "url": "https://open-meteo.com*"
+        }
+      ]
     }
   ]
 }

@@ -1,0 +1,51 @@
+name: Release
+
+# Push a version tag (e.g. `git tag v0.4.0 && git push origin v0.4.0`) to build signed Windows installers and
+# the updater manifest (latest.json). The release is created as a draft: check it, then press "Publish release"
+# so the in-app updater can see it.
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    name: Build Windows installers
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: src-tauri
+      - run: npm ci
+      - run: npm run verify
+      - uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Signs the update packages; the matching public key is in tauri.conf.json.
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: TickPuff ${{ github.ref_name }}
+          releaseBody: |
+            See [CHANGELOG.md](https://github.com/WiseHax/TickPuff/blob/main/CHANGELOG.md) for what's new.
+
+            **Windows:** download `TickPuff_*_x64-setup.exe` below and run it.
+            The app isn't code-signed yet, so Windows may say it protected your PC: click **More info → Run anyway**.
+
+            Already installed? TickPuff offers the update itself (Settings → About → Check for updates).
+          releaseDraft: true
+          prerelease: false
+          includeUpdaterJson: true
+          # Updater artifacts need the signing key, so they are only produced here (not in local builds).
+          args: --config src-tauri/tauri.release.conf.json

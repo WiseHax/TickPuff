@@ -47,5 +47,14 @@
     "license": "MIT",
     "homepage": "https://github.com/WiseHax/TickPuff",
     "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.icns", "icons/icon.ico"]
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDc1RDlGRDY0Q0JFNUIzRjIKUldUeXMrWExaUDNaZFdOMW1zakRRRHRVM3c1aG5TLytvTVdTYzNqWHhOc1Z1N3NyMjVpblBJaW0K",
+      "endpoints": ["https://github.com/WiseHax/TickPuff/releases/latest/download/latest.json"],
+      "windows": {
+        "installMode": "passive"
+      }
+    }
   }
 }

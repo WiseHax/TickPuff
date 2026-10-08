@@ -123,6 +123,18 @@ export const companionSizeSpec: PersistSpec<CompanionSize> = {
 
 export const companionSize = persisted(companionSizeSpec);
 
+// ── Updates ──────────────────────────────────────────────────
+
+/** Check GitHub for a new release shortly after startup (desktop app only). */
+export const autoUpdateCheckSpec: PersistSpec<boolean> = {
+  key: 'tickpuff-update-check',
+  version: 1,
+  defaults: () => true,
+  sanitize: (raw) => (typeof raw === 'boolean' ? raw : null),
+};
+
+export const autoUpdateCheck = persisted(autoUpdateCheckSpec);
+
 // ── UI modes ─────────────────────────────────────────────────
 
 export const DEFAULT_UI: UIState = {

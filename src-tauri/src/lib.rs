@@ -11,11 +11,19 @@ mod tray;
 use services::{ai_detect::AiDetector, system_monitor::SystemMonitor, window_modes::WindowModes};
 use tauri_plugin_autostart::MacosLauncher;
 
+/// Built for the Microsoft Store (`TICKPUFF_STORE=1`): the Store installs updates and manages
+/// startup, so the self-updater and the registry-based autostart are left out.
+pub(crate) const STORE_BUILD: bool = option_env!("TICKPUFF_STORE").is_some();
+
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    tauri::Builder::default()
+    let mut builder = tauri::Builder::default()
         .plugin(tauri_plugin_opener::init())
-        .plugin(tauri_plugin_autostart::init(MacosLauncher::LaunchAgent, None))
+        .plugin(tauri_plugin_autostart::init(MacosLauncher::LaunchAgent, None));
+    if !STORE_BUILD {
+        builder = builder.plugin(tauri_plugin_updater::Builder::new().build());
+    }
+    builder
         .manage(SystemMonitor::new())
         .manage(AiDetector::new())
         .manage(WindowModes::default())
