@@ -243,9 +243,10 @@ export class ProceduralAnimator implements Animator {
     } else if (activity === 'sleep') {
       p.bodyY = -(this.rig.body.userData.restY ?? 0.6) * 0.55;
       p.legs = [1.25, 1.25, -1.25, -1.25];
-      p.headPitch = 0.35;
-      p.headYaw = 0.55;
-      p.headRoll = 0.2;
+      // Head resting low and tilted toward the viewer, so the sleeping face stays visible.
+      p.headPitch = 0.2;
+      p.headYaw = 0.5;
+      p.headRoll = 0.3;
       p.squash = 1 + Math.sin(t * 1.1) * 0.03;
       p.tailYaw = 1.25;
       p.tailPitch = 0.5;

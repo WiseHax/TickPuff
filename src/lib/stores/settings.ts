@@ -4,8 +4,8 @@
  */
 import { derived } from 'svelte/store';
 import { asBoolean, asNumber, asOneOf, isRecord, persisted, type PersistSpec } from '$lib/core/persistence';
-import { CLOCK_FONTS, PERFORMANCE_MODES } from '$lib/types';
-import type { ClockSettings, PerformanceMode, PerformanceProfile, UIState } from '$lib/types';
+import { CLOCK_FONTS, COMPANION_SIZES, PERFORMANCE_MODES } from '$lib/types';
+import type { ClockSettings, CompanionSize, PerformanceMode, PerformanceProfile, UIState } from '$lib/types';
 
 // ── Clock ────────────────────────────────────────────────────
 
@@ -103,6 +103,25 @@ export const performanceSpec: PersistSpec<PerformanceMode> = {
 export const performanceMode = persisted(performanceSpec);
 
 export const performanceProfile = derived(performanceMode, ($mode) => PERFORMANCE_PROFILES[$mode]);
+
+// ── Companion size ───────────────────────────────────────────
+
+/** World-space scale multiplier for each companion size. */
+export const COMPANION_SIZE_SCALE: Record<CompanionSize, number> = {
+  small: 1.3,
+  medium: 1.75,
+  large: 2.2,
+};
+
+export const companionSizeSpec: PersistSpec<CompanionSize> = {
+  key: 'tickpuff-companion-size',
+  version: 1,
+  defaults: () => 'large',
+  sanitize: (raw) =>
+    typeof raw === 'string' && (COMPANION_SIZES as string[]).includes(raw) ? (raw as CompanionSize) : null,
+};
+
+export const companionSize = persisted(companionSizeSpec);
 
 // ── UI modes ─────────────────────────────────────────────────
 

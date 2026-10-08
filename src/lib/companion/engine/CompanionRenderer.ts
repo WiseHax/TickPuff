@@ -24,6 +24,7 @@ import { BehaviorController } from '../behavior/BehaviorController';
 import { InteractionController } from '../interaction/InteractionController';
 import { Navigator, type Vec3 } from '../navigation/Navigator';
 import { StageMapper } from '../navigation/StageMapper';
+import { companionLook } from '../models/parts';
 import { loadGltfCompanion, loadProceduralCompanion, type LoadedCompanion } from './CompanionLoader';
 
 export interface WorldContext {
@@ -41,6 +42,8 @@ export interface RendererOptions {
   host: HTMLElement;
   hitbox: HTMLElement | null;
   profile: PerformanceProfile;
+  /** World-space size multiplier for the companion (the Companion size setting). */
+  size?: number;
   /** Called when the companion starts a new activity. */
   onStateChange?: (state: CompanionState) => void;
   /** Position to continue from (e.g. after the renderer is recreated). */
@@ -51,20 +54,24 @@ const FOV = 30;
 const CAMERA_POSITION = new THREE.Vector3(0, 4.3, 15);
 const CAMERA_TARGET = new THREE.Vector3(0, 3, 0);
 const SPAWN_SECONDS = 0.45;
+/** Ink outline width in device pixels. */
+const OUTLINE_PIXELS = 1.6;
 
 interface LightPreset {
   key: string;
   keyIntensity: number;
   hemiIntensity: number;
   rimIntensity: number;
+  /** Strength of the cel-shaded rim light on the companion's silhouette. */
+  edge: number;
 }
 
 const LIGHTING: Record<TimeOfDay, LightPreset> = {
-  morning: { key: '#ffe2c4', keyIntensity: 1.5, hemiIntensity: 1.05, rimIntensity: 0.5 },
-  day: { key: '#fff6e8', keyIntensity: 1.7, hemiIntensity: 1.2, rimIntensity: 0.45 },
-  sunset: { key: '#ffb074', keyIntensity: 1.5, hemiIntensity: 0.95, rimIntensity: 0.7 },
-  night: { key: '#a8bcff', keyIntensity: 1.0, hemiIntensity: 0.75, rimIntensity: 0.9 },
-  'late-night': { key: '#8697d8', keyIntensity: 0.8, hemiIntensity: 0.6, rimIntensity: 0.9 },
+  morning: { key: '#ffe2c4', keyIntensity: 1.5, hemiIntensity: 1.05, rimIntensity: 0.5, edge: 0.35 },
+  day: { key: '#fff6e8', keyIntensity: 1.7, hemiIntensity: 1.2, rimIntensity: 0.45, edge: 0.3 },
+  sunset: { key: '#ffb074', keyIntensity: 1.5, hemiIntensity: 0.95, rimIntensity: 0.7, edge: 0.55 },
+  night: { key: '#a8bcff', keyIntensity: 1.0, hemiIntensity: 0.75, rimIntensity: 0.9, edge: 0.6 },
+  'late-night': { key: '#8697d8', keyIntensity: 0.8, hemiIntensity: 0.6, rimIntensity: 0.9, edge: 0.55 },
 };
 
 /** Activities during which the companion turns to face the viewer. */
@@ -98,6 +105,7 @@ export class CompanionRenderer {
   private readonly resizeObserver: ResizeObserver;
 
   private profile: PerformanceProfile;
+  private size: number;
   private world: WorldContext | null = null;
   private companion: LoadedCompanion | null = null;
   private loadToken = 0;
@@ -121,6 +129,7 @@ export class CompanionRenderer {
 
   constructor(private readonly options: RendererOptions) {
     this.profile = options.profile;
+    this.size = options.size ?? 1;
     this.renderer = new THREE.WebGLRenderer({
       alpha: true,
       antialias: options.profile.antialias,
@@ -178,6 +187,14 @@ export class CompanionRenderer {
     this.profile = profile;
     this.effects.setDensity(profile.particleDensity);
     this.resize();
+  }
+
+  /** Change the companion's size (world-space multiplier). */
+  setSize(size: number) {
+    if (size === this.size) return;
+    this.size = size;
+    this.navigator.stop();
+    this.lastPlan = -1;
   }
 
   snapshot(): { position: Vec3; heading: number } {
@@ -279,6 +296,9 @@ export class CompanionRenderer {
     this.key.intensity = preset.keyIntensity * dim;
     this.rim.color.set(colors.accent);
     this.rim.intensity = preset.rimIntensity * dim;
+    // Silhouette glow picks up the sky and the world's accent colour.
+    companionLook.rimColor.value.copy(sky).lerp(new THREE.Color(colors.accent), 0.35);
+    companionLook.rimStrength.value = preset.edge * dim;
   }
 
   private resize() {
@@ -291,6 +311,7 @@ export class CompanionRenderer {
     this.camera.updateProjectionMatrix();
     const pixelsPerUnit = (height * ratio) / (2 * Math.tan(THREE.MathUtils.degToRad(FOV / 2)));
     this.effects.setScale(pixelsPerUnit, ratio);
+    companionLook.outlineWidth.value = (OUTLINE_PIXELS * ratio) / pixelsPerUnit;
     if (this.raf === 0 && !this.disposed) this.renderer.render(this.scene, this.camera);
   }
 
@@ -354,7 +375,7 @@ export class CompanionRenderer {
       this.lastPlan = output.plan;
       if (output.destination) {
         const ground = this.mapper.toWorld(output.destination.x, output.destination.depth);
-        const speed = output.pace === 'run' ? definition.speed.run : definition.speed.walk;
+        const speed = (output.pace === 'run' ? definition.speed.run : definition.speed.walk) * this.size;
         this.navigator.moveTo({ x: ground.x, y: this.altitudeFor(output.destination.altitude), z: ground.z }, speed);
       } else {
         this.navigator.stop();
@@ -383,9 +404,9 @@ export class CompanionRenderer {
       this.spawn = Math.min(1, this.spawn + dt / SPAWN_SECONDS);
       const t = this.spawn;
       const pop = 1 + Math.sin(t * Math.PI) * 0.15;
-      this.actor.scale.setScalar(Math.max(0.01, t * pop));
+      this.actor.scale.setScalar(Math.max(0.01, t * pop) * this.size);
     } else {
-      this.actor.scale.setScalar(1);
+      this.actor.scale.setScalar(this.size);
     }
 
     let lookYaw = 0;
@@ -401,7 +422,7 @@ export class CompanionRenderer {
     animator.update(dt, this.time, {
       activity: output.activity,
       activityTime: output.activityTime,
-      speed: this.navigator.speed,
+      speed: this.navigator.speed / this.size,
       runSpeed: definition.speed.run,
       lookYaw,
       lookPitch,
@@ -409,7 +430,7 @@ export class CompanionRenderer {
     });
 
     // Blob shadow on the ground, smaller and fainter the higher we float.
-    const scale = definition.scale;
+    const scale = definition.scale * this.size;
     const lift = clamp(this.navigator.position.y / 4, 0, 0.7);
     const size = rig.footprint * 2.2 * scale * (1 - lift * 0.6);
     this.shadow.position.set(this.navigator.position.x, 0.01, this.navigator.position.z);
@@ -436,6 +457,7 @@ export class CompanionRenderer {
 
   private altitudeFor(fraction: number): number {
     const range = this.companion?.definition.altitude;
+    // Altitudes are not scaled with the size: a bigger swimmer still has to fit under the window's top edge.
     return range ? lerp(range.min, range.max, clamp(fraction, 0, 1)) : 0;
   }
 }

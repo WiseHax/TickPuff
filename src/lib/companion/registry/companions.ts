@@ -1,9 +1,9 @@
 /**
  * Companion registry.
  *
- * Every companion currently ships as a procedural model (built from simple
- * geometry at runtime). These are technical stand-ins, not final art; a
- * definition can point at a GLB/GLTF asset instead — see docs/companions.md.
+ * Every companion ships as a procedural model (built at runtime with cel
+ * shading and outlines). A definition can point at a GLB/GLTF asset instead —
+ * see docs/companions.md.
  */
 import type { CompanionDefinition, CompanionId } from '$lib/types';
 

@@ -4,9 +4,9 @@
   import { rendererStatus } from '$lib/companion/status';
   import { activeTheme, activeThemeState, world } from '$lib/stores/world';
   import { effectiveWeather } from '$lib/stores/atmosphere';
-  import { ui } from '$lib/stores/settings';
+  import { companionSize, ui } from '$lib/stores/settings';
   import { weatherSettings } from '$lib/integrations/weather';
-  import { WEATHER_LABELS, type WeatherType } from '$lib/types';
+  import { COMPANION_SIZES, WEATHER_LABELS, type WeatherType } from '$lib/types';
 
   const syncing = $derived($weatherSettings.syncAtmosphere && $weatherSettings.location !== null);
 </script>
@@ -26,12 +26,21 @@
   {/each}
 </div>
 <Switch label="Show companion" checked={$ui.companionVisible} onchange={(value) => ui.set('companionVisible', value)} />
+<div class="field">
+  <span class="field-label" id="size-label">Size</span>
+  <div class="segmented" role="radiogroup" aria-labelledby="size-label">
+    {#each COMPANION_SIZES as size (size)}
+      <button role="radio" aria-checked={$companionSize === size} onclick={() => companionSize.set(size)}>
+        {size}
+      </button>
+    {/each}
+  </div>
+</div>
 {#if $rendererStatus === 'unavailable'}
   <p class="hint warn">3D rendering (WebGL) isn't available on this system, so the companion can't be shown.</p>
 {/if}
 <p class="hint note">
-  Companions are currently simple procedural models built from basic shapes — placeholders until proper 3D art is added.
-  Each one can be replaced with a GLB model (see docs/companions.md).
+  Companions are hand-built procedural models. Each one can be replaced with a GLB model (see docs/companions.md).
 </p>
 
 <h3 class="section-title">Atmosphere</h3>
@@ -77,6 +86,23 @@
   .choice[aria-checked='true'] {
     border-color: var(--accent-color);
     background: rgba(255, 255, 255, 0.1);
+  }
+  .segmented {
+    display: inline-flex;
+    gap: 2px;
+    padding: 2px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.06);
+  }
+  .segmented button {
+    padding: 0.35rem 0.9rem;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    text-transform: capitalize;
+  }
+  .segmented button[aria-checked='true'] {
+    background: var(--accent-color);
+    color: #fff;
   }
   .note {
     margin-top: 0.7rem;

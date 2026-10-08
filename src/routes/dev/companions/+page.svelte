@@ -77,7 +77,7 @@
         companion.rig.root.visible = only === 'all' || only === companion.definition.id;
         if (only === companion.definition.id) {
           const p = companion.rig.root.position;
-          camera.position.set(p.x, p.y + 1.1, p.z + 6);
+          camera.position.set(p.x, p.y + 1, p.z + 4.2);
           camera.lookAt(p.x, p.y + 0.7, p.z);
         }
         companion.rig.root.rotation.y = turn;

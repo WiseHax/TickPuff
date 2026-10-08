@@ -6,4 +6,4 @@ export type * from './focus';
 export type * from './settings';
 
 export { TIMES_OF_DAY, WEATHER_TYPES, WEATHER_LABELS } from './world';
-export { PERFORMANCE_MODES, CLOCK_FONTS } from './settings';
+export { PERFORMANCE_MODES, CLOCK_FONTS, COMPANION_SIZES } from './settings';

@@ -19,6 +19,11 @@ export interface PerformanceProfile {
   parallax: boolean;
 }
 
+/** How large the companion is drawn in the world. */
+export type CompanionSize = 'small' | 'medium' | 'large';
+
+export const COMPANION_SIZES: readonly CompanionSize[] = ['small', 'medium', 'large'];
+
 export type ClockFont = 'Theme' | 'Pixelify Sans' | 'VT323' | 'Space Mono' | 'Outfit' | 'Inter' | 'System';
 
 export const CLOCK_FONTS: readonly ClockFont[] = [

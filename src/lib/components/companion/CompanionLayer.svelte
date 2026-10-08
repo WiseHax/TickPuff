@@ -8,7 +8,7 @@
   import { activeColors, activeTheme, activeThemeState } from '$lib/stores/world';
   import { ambientEffects, effectiveWeather } from '$lib/stores/atmosphere';
   import { focusActive } from '$lib/stores/focus';
-  import { performanceProfile, ui } from '$lib/stores/settings';
+  import { COMPANION_SIZE_SCALE, companionSize, performanceProfile, ui } from '$lib/stores/settings';
   import type { CompanionActivity } from '$lib/types';
 
   let host: HTMLDivElement;
@@ -43,6 +43,7 @@
         host,
         hitbox,
         profile: $performanceProfile,
+        size: COMPANION_SIZE_SCALE[$companionSize],
         initial,
         onStateChange: (state) => companionState.set(state),
       });
@@ -84,6 +85,10 @@
 
   $effect(() => {
     renderer?.setCompanion(definition);
+  });
+
+  $effect(() => {
+    renderer?.setSize(COMPANION_SIZE_SCALE[$companionSize]);
   });
 
   $effect(() => {
