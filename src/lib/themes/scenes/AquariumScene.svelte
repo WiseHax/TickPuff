@@ -1,159 +1,333 @@
 <script lang="ts">
   import type { TimeOfDay } from '$lib/types';
+  import { BOTTOM, GROUND_Y, H, TOP, W, grass, mix, ridge, rng, specks } from './art';
 
   let { time }: { time: TimeOfDay } = $props();
   const dark = $derived(time === 'night' || time === 'late-night');
+
+  const random = rng(51);
+  const f = (n: number) => Math.round(n);
+
+  /** Branching coral as a stroke path (thick at the base, forking upward). */
+  function coral(x: number, y: number, height: number, seed: number): { d: string; tips: [number, number][] } {
+    const r = rng(seed);
+    const tips: [number, number][] = [];
+    let d = '';
+    const grow = (px: number, py: number, angle: number, length: number, depth: number) => {
+      const ex = px + Math.sin(angle) * length;
+      const ey = py - Math.cos(angle) * length;
+      d += `M${f(px)},${f(py)} Q${f(px + Math.sin(angle + 0.3) * length * 0.5)},${f(py - length * 0.5)} ${f(ex)},${f(ey)} `;
+      if (depth === 0) tips.push([f(ex), f(ey)]);
+      if (depth > 0) {
+        const forks = 2 + (r() > 0.6 ? 1 : 0);
+        for (let i = 0; i < forks; i++) {
+          grow(ex, ey, angle + (i - (forks - 1) / 2) * (0.5 + r() * 0.3), length * (0.62 + r() * 0.15), depth - 1);
+        }
+      }
+    };
+    grow(x, y, 0, height * 0.38, 3);
+    return { d, tips };
+  }
+
+  /** A swaying kelp ribbon from (x, bottom) up to height. */
+  function kelp(x: number, bottom: number, height: number, seed: number): string {
+    const r = rng(seed);
+    const segments = 7;
+    let left = `M${x - 8},${bottom}`;
+    let right = '';
+    for (let i = 1; i <= segments; i++) {
+      const t = i / segments;
+      const sway = Math.sin(t * Math.PI * 2.2 + r() * 0.5) * 22;
+      const width = 17 * (1 - t * 0.65);
+      const y = bottom - height * t;
+      left += ` Q${f(x + sway - width * 2)},${f(y + height / segments / 2)} ${f(x + sway - width)},${f(y)}`;
+      right = ` Q${f(x + sway + width * 2)},${f(y + height / segments / 2)} ${f(x + sway + width)},${f(y)}` + right;
+    }
+    return `${left} L${x + 8},${bottom - height}${right} L${x + 8},${bottom} Z`;
+  }
+
+  const farReef = ridge(52, { y: 560, amplitude: 60, roughness: 4, scale: 0.8 });
+  const midReef = ridge(53, { y: 610, amplitude: 36, roughness: 3 });
+  const sand = ridge(54, { y: GROUND_Y, amplitude: 12, roughness: 2, scale: 2 });
+  const pebbles = specks(55, 70, GROUND_Y + 30, H - 10, 6);
+  const plankton = specks(56, 60, 80, 700, 3);
+
+  interface Kelp {
+    d: string;
+    /** Placement as percentages of the layer. */
+    left: number;
+    bottom: number;
+    height: number;
+    aspect: string;
+    delay: number;
+  }
+
+  /**
+   * Kelp drawn in its own small SVG (positioned in % of the layer) so its sway
+   * animates on the compositor instead of repainting the whole scene.
+   */
+  function kelpStalk(x: number, base: number, height: number, seed: number): Kelp {
+    const box = height + 40;
+    return {
+      d: kelp(60, box, height, seed),
+      left: ((x - 60) / W) * 100,
+      bottom: ((H - base) / H) * 100,
+      height: (box / H) * 100,
+      aspect: `120 / ${box}`,
+      delay: random() * -6,
+    };
+  }
+
+  const kelpBack = Array.from({ length: 9 }, (_, i) =>
+    kelpStalk(40 + i * 190 + random() * 80, 640, 260 + random() * 200, 60 + i),
+  );
+  const kelpFront = [80, 170, 1540].map((x, i) => kelpStalk(x, 920, 520 + random() * 160, 80 + i));
+  const corals = [
+    { x: 300, y: 700, h: 190, color: '#ff7a8a', seed: 90 },
+    { x: 360, y: 715, h: 120, color: '#ffb35a', seed: 94 },
+    { x: 1170, y: 690, h: 170, color: '#ffb35a', seed: 91 },
+    { x: 1240, y: 700, h: 110, color: '#ff7a8a', seed: 95 },
+    { x: 1500, y: 730, h: 230, color: '#c58cff', seed: 92 },
+    { x: 520, y: 660, h: 120, color: '#ff9fc0', seed: 93 },
+    { x: 860, y: 655, h: 90, color: '#7fe3c4', seed: 96 },
+  ].map((c) => ({ ...c, ...coral(c.x, c.y, c.h, c.seed) }));
+  const seaGrass = grass(57, GROUND_Y + 14, 150, 18, 48);
+
+  const water = mix(TOP, BOTTOM, 45);
+  const far = mix(BOTTOM, TOP, 70);
+  const mid = mix(BOTTOM, '#062a44', 70);
+  const sandColor = $derived(dark ? mix('#3a4a5a', BOTTOM, 40) : mix('#f2dcae', BOTTOM, 70));
 </script>
 
-<div class="world-layer" style="--depth: 10">
+<div class="world-layer" style="--depth: 4">
+  <div class="surface"></div>
   <div class="godrays" class:dim={dark}></div>
-  <div class="haze"></div>
+  <svg class="fill" viewBox="0 0 {W} {H}" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+    <path d={farReef} style="fill: {far}" opacity="0.7" />
+    <!-- Distant rock arch. -->
+    <path
+      d="M900,600 C900,420 980,330 1080,330 C1180,330 1250,420 1250,600 L1190,600 C1190,470 1140,410 1080,410 C1020,410 970,470 970,600 Z"
+      style="fill: {far}"
+      opacity="0.85"
+    />
+  </svg>
 </div>
 
-<div class="world-layer" style="--depth: 20">
-  <svg class="coral" viewBox="0 0 1000 300" preserveAspectRatio="none">
-    <path d="M0,300 C150,200 250,50 400,150 C550,250 700,80 1000,180 L1000,300 Z" fill="rgba(0,0,0,0.4)" />
+<div class="world-layer" style="--depth: 14">
+  {#each kelpBack as k, i (i)}
+    <svg
+      class="kelp sway"
+      viewBox="0 0 120 {k.aspect.split(' / ')[1]}"
+      style="left: {k.left}%; bottom: {k.bottom}%; height: {k.height}%; aspect-ratio: {k.aspect}; animation-delay: {k.delay}s"
+      aria-hidden="true"
+    >
+      <path d={k.d} style="fill: {mix('#2f8f6a', water, 45)}" />
+    </svg>
+  {/each}
+  <svg class="fill" viewBox="0 0 {W} {H}" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+    <path d={midReef} style="fill: {mid}" />
   </svg>
-  <div class="kelp-forest">
-    <svg viewBox="0 0 100 400" class="kelp k1"
-      ><path
-        d="M50,400 Q10,300 50,200 T50,0"
+</div>
+
+<div class="world-layer" style="--depth: 26">
+  <svg class="fill" viewBox="0 0 {W} {H}" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+    <defs>
+      <linearGradient id="aqua-sand" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" style="stop-color: {mix(sandColor, 'white', 80)}" />
+        <stop offset="0.3" style="stop-color: {sandColor}" />
+        <stop offset="1" style="stop-color: {mix(sandColor, '#01121f', 45)}" />
+      </linearGradient>
+    </defs>
+    <path d={sand} fill="url(#aqua-sand)" />
+    <!-- Sand ripples. -->
+    {#each [700, 740, 790, 845] as y, i (i)}
+      <path
+        d="M0,{y} Q200,{y - 10} 400,{y} T800,{y} T1200,{y} T1600,{y}"
         fill="none"
-        stroke="rgba(0,0,0,0.3)"
-        stroke-width="15"
-        stroke-linecap="round"
-      /></svg
-    >
-    <svg viewBox="0 0 100 400" class="kelp k2"
-      ><path
-        d="M50,400 Q90,250 50,150 T50,20"
+        style="stroke: {mix(sandColor, '#000', 75)}"
+        stroke-width={2 + i}
+        opacity="0.35"
+      />
+    {/each}
+    {#each corals as c, i (i)}
+      <path
+        d={c.d}
         fill="none"
-        stroke="rgba(0,0,0,0.3)"
-        stroke-width="12"
+        style="stroke: {dark ? mix(c.color, BOTTOM, 70) : c.color}"
+        stroke-width={c.h / 7}
         stroke-linecap="round"
-      /></svg
-    >
-  </div>
+        class:glow={dark}
+      />
+      {#each c.tips as [tx, ty], j (j)}
+        <circle
+          cx={tx}
+          cy={ty}
+          r={c.h / 11}
+          style="fill: {dark ? c.color : mix(c.color, 'white', 75)}"
+          class:glow={dark}
+        />
+      {/each}
+    {/each}
+    <path d={seaGrass} style="fill: {dark ? '#1f5a4a' : '#3f9f6a'}" opacity="0.85" />
+    <!-- Brain coral and anemone mounds. -->
+    <ellipse cx="420" cy="712" rx="54" ry="34" style="fill: {dark ? '#3a4a7a' : '#7fd0c0'}" />
+    <ellipse cx="420" cy="700" rx="40" ry="20" style="fill: {dark ? '#4a5a8a' : '#a6e6d4'}" />
+    {#each pebbles as p, i (i)}
+      <ellipse cx={p.x} cy={p.y} rx={p.r * 1.4} ry={p.r * 0.8} style="fill: {mix(sandColor, '#5a4a3a', 55)}" />
+    {/each}
+    <!-- Starfish and a shell. -->
+    <path
+      transform="translate(640 820) rotate(12)"
+      d="M0,-26 L7,-8 L26,-8 L11,4 L17,23 L0,12 L-17,23 L-11,4 L-26,-8 L-7,-8 Z"
+      fill="#ff8a5c"
+      stroke="#e0603a"
+      stroke-width="3"
+      stroke-linejoin="round"
+    />
+    <path transform="translate(1000 850)" d="M-22,0 A22,20 0 0,1 22,0 L0,6 Z" fill="#ffe2d0" />
+    <path
+      transform="translate(1000 850)"
+      d="M0,4 L-16,-12 M0,4 L-6,-19 M0,4 L6,-19 M0,4 L16,-12"
+      stroke="#e8b8a0"
+      stroke-width="2"
+    />
+  </svg>
+
+  {#if dark}
+    <div class="plankton">
+      {#each plankton as p, i (i)}
+        <span style="left: {(p.x / W) * 100}%; top: {(p.y / H) * 100}%; width: {p.r}px; animation-delay: {-p.hue * 6}s"
+        ></span>
+      {/each}
+    </div>
+  {/if}
 </div>
 
 <div class="world-layer" style="--depth: 40">
-  <svg class="ground" viewBox="0 0 1000 150" preserveAspectRatio="none">
-    <path d="M0,150 L0,40 Q250,80 550,30 T1000,70 L1000,150 Z" fill="rgba(0,0,0,0.8)" />
+  {#each kelpFront as k, i (i)}
+    <svg
+      class="kelp sway slow"
+      viewBox="0 0 120 {k.aspect.split(' / ')[1]}"
+      style="left: {k.left}%; bottom: {k.bottom}%; height: {k.height}%; aspect-ratio: {k.aspect}; animation-delay: {k.delay}s"
+      aria-hidden="true"
+    >
+      <path d={k.d} style="fill: {mix('#1f6a4a', BOTTOM, 60)}" />
+    </svg>
+  {/each}
+  <svg class="fill" viewBox="0 0 {W} {H}" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+    <!-- Rock ledge on the right (the "Rock ledge" zone). -->
+    <path
+      d="M1180,900 C1170,800 1200,740 1260,722 C1330,700 1420,700 1480,730 C1540,760 1560,820 1560,900 Z"
+      style="fill: {mix(BOTTOM, '#1a2a3a', 55)}"
+    />
+    <path
+      d="M1230,744 C1290,712 1400,706 1470,736 C1400,728 1300,730 1230,744 Z"
+      style="fill: {mix(TOP, BOTTOM, 40)}"
+      opacity="0.7"
+    />
   </svg>
-  <svg viewBox="0 0 200 150" class="rock r1"
-    ><path d="M0,150 L20,50 Q100,0 180,60 L200,150 Z" fill="rgba(0,0,0,0.9)" /></svg
-  >
-  <svg viewBox="0 0 300 200" class="rock r2"
-    ><path d="M0,200 L40,80 Q150,10 260,90 L300,200 Z" fill="rgba(0,0,0,0.9)" /></svg
-  >
-  <svg class="seaweed" viewBox="0 0 50 200"
-    ><path
-      d="M25,200 Q0,150 25,100 T25,0"
-      fill="none"
-      stroke="#2e7d32"
-      stroke-width="12"
-      stroke-linecap="round"
-      opacity="0.6"
-    /></svg
-  >
+  <!-- Seaweed by the "Seaweed" zone (x ≈ 0.36). -->
+  <svg class="prop seaweed" viewBox="0 0 120 220" aria-hidden="true">
+    <path class="sway" d={kelp(40, 220, 200, 70)} transform="translate(-10 0)" fill="#3fae6e" />
+    <path class="sway slow" d={kelp(70, 220, 160, 71)} fill="#2e8f58" />
+    <path class="sway" d={kelp(95, 220, 120, 72)} transform="translate(-5 0)" fill="#58c486" />
+  </svg>
 </div>
 
 <style>
+  .fill {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  .surface {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    height: 22%;
+    background:
+      repeating-radial-gradient(ellipse 60px 14px at 30% 0%, rgba(255, 255, 255, 0.12) 0 2px, transparent 3px 22px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.25), transparent);
+    animation: shimmer 9s ease-in-out infinite alternate;
+  }
   .godrays {
     position: absolute;
-    top: -20%;
-    left: -20%;
-    width: 140%;
-    height: 140%;
+    inset: -10% -10% 30% -10%;
     background: repeating-linear-gradient(
-      15deg,
-      transparent,
-      transparent 150px,
-      rgba(255, 255, 255, 0.04) 150px,
-      rgba(255, 255, 255, 0.04) 180px
+      100deg,
+      transparent 0 70px,
+      rgba(255, 255, 255, 0.09) 90px 130px,
+      transparent 150px 230px
     );
-    animation: sway 20s ease-in-out infinite alternate;
-    transition: opacity 2s;
+    mask-image: linear-gradient(to bottom, black, transparent);
+    animation: rays 14s ease-in-out infinite alternate;
   }
   .godrays.dim {
-    opacity: 0.35;
-  }
-  .haze {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    height: 60%;
-    background: linear-gradient(to top, rgba(0, 20, 40, 0.35), transparent);
-  }
-  .coral {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    height: 300px;
-  }
-  .kelp-forest {
-    position: absolute;
-    bottom: 0;
-    left: 20%;
-    width: 100px;
-    height: 400px;
-    opacity: 0.5;
+    opacity: 0.25;
   }
   .kelp {
     position: absolute;
-    bottom: 0;
-    height: 100%;
-    animation: sway-kelp 4s ease-in-out infinite alternate;
-    transform-origin: bottom center;
+    overflow: visible;
   }
-  .k2 {
-    left: 40px;
-    animation-delay: -2s;
+  .sway {
+    transform-box: fill-box;
+    transform-origin: 50% 100%;
+    animation: sway 7s ease-in-out infinite alternate;
   }
-  .ground {
+  .sway.slow {
+    animation-duration: 10s;
+  }
+  .glow {
+    filter: drop-shadow(0 0 8px rgba(190, 160, 255, 0.75));
+  }
+  .prop {
     position: absolute;
-    bottom: 0;
-    width: 100%;
-    height: 180px;
-  }
-  .rock {
-    position: absolute;
-    bottom: -20px;
-    filter: drop-shadow(0 -5px 15px rgba(0, 0, 0, 0.6));
-  }
-  .r1 {
-    left: 5%;
-    width: 200px;
-    height: 150px;
-  }
-  .r2 {
-    right: 10%;
-    width: 300px;
-    height: 200px;
   }
   .seaweed {
+    left: 29%;
+    bottom: 11%;
+    width: clamp(70px, 8vw, 130px);
+  }
+  .plankton span {
     position: absolute;
-    bottom: 0;
-    left: 30%;
-    width: 50px;
-    height: 200px;
-    animation: sway-kelp 3s infinite alternate;
-    transform-origin: bottom;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: #9ff4ff;
+    box-shadow: 0 0 8px 2px rgba(120, 230, 255, 0.7);
+    animation: glimmer 6s ease-in-out infinite;
   }
   @keyframes sway {
     from {
-      transform: translateX(-2%) rotate(0deg);
+      transform: rotate(-3deg);
     }
     to {
-      transform: translateX(2%) rotate(1deg);
+      transform: rotate(3deg);
     }
   }
-  @keyframes sway-kelp {
-    from {
-      transform: skewX(-5deg);
-    }
+  @keyframes shimmer {
     to {
-      transform: skewX(5deg);
+      background-position:
+        80px 0,
+        0 0;
+    }
+  }
+  @keyframes rays {
+    to {
+      transform: translateX(6%);
+      opacity: 0.7;
+    }
+  }
+  @keyframes glimmer {
+    0%,
+    100% {
+      opacity: 0.15;
+      transform: translateY(0);
+    }
+    50% {
+      opacity: 1;
+      transform: translateY(-12px);
     }
   }
 </style>

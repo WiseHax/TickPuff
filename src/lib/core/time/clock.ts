@@ -1,5 +1,5 @@
 import { derived, readable } from 'svelte/store';
-import type { TimeOfDay } from '$lib/types';
+import { TIMES_OF_DAY, type TimeOfDay } from '$lib/types';
 
 /**
  * Current time, updated on each wall-clock second boundary.
@@ -36,7 +36,20 @@ export function timeOfDayFor(date: Date): TimeOfDay {
   return 'late-night';
 }
 
-export const timeOfDay = derived(now, ($now, set) => set(timeOfDayFor($now)), timeOfDayFor(new Date()));
+/** Dev builds only: preview a time of day with `?time=night` (any TimeOfDay). */
+function devTimeOverride(): TimeOfDay | null {
+  if (!import.meta.env.DEV || typeof location === 'undefined') return null;
+  const value = new URLSearchParams(location.search).get('time');
+  return (TIMES_OF_DAY as readonly string[]).includes(value ?? '') ? (value as TimeOfDay) : null;
+}
+
+const override = devTimeOverride();
+
+export const timeOfDay = derived(
+  now,
+  ($now, set) => set(override ?? timeOfDayFor($now)),
+  override ?? timeOfDayFor(new Date()),
+);
 
 /** Local calendar date as YYYY-MM-DD (not UTC). */
 export function localDateKey(date: Date): string {

@@ -45,7 +45,14 @@
   });
 </script>
 
-<div class="world" class:night={dark} class:asleep={$ui.sleepMode} bind:this={root} aria-hidden="true">
+<div
+  class="world"
+  class:night={dark}
+  class:asleep={$ui.sleepMode}
+  class:still={!$performanceProfile.parallax}
+  bind:this={root}
+  aria-hidden="true"
+>
   {#key $activeTheme.id}
     <div class="scene">
       <Scene time={$timeOfDay} />
@@ -68,6 +75,20 @@
   }
   .world.asleep {
     filter: brightness(0.55) saturate(0.8);
+  }
+  /* ECO: no parallax, so the layers don't need their own GPU surfaces, and the scenery holds still. */
+  .world.still :global(.world-layer) {
+    transform: none;
+    transition: none;
+    will-change: auto;
+  }
+  .world.still :global(.scene *) {
+    animation-play-state: paused;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .world :global(.scene *) {
+      animation-play-state: paused;
+    }
   }
   .scene {
     position: absolute;

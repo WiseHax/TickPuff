@@ -8,7 +8,7 @@ export const library: ThemeDefinition = {
   defaultWeather: 'dust',
   companions: ['owl', 'cat'],
   defaultCompanion: 'owl',
-  clock: { font: 'Outfit', shadow: '0 4px 15px rgba(255, 193, 7, 0.3)' },
+  clock: { font: 'Outfit', shadow: '0 3px 18px rgba(45, 25, 12, 0.65)' },
   ambient: [],
   colors: {
     morning: {
