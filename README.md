@@ -7,6 +7,12 @@
 <p align="center"><strong>A lightweight ambient desktop clock and living companion.</strong></p>
 
 <p align="center">
+  <a href="https://apps.microsoft.com/detail/9NCCLZRSL5WV?mode=direct">
+    <img src="https://get.microsoft.com/images/en-us%20dark.svg" width="200" alt="Get it from Microsoft">
+  </a>
+</p>
+
+<p align="center">
   <a href="LICENSE">MIT License</a> ·
   <a href="docs/development.md">Development</a> ·
   <a href="docs/architecture.md">Architecture</a> ·
@@ -63,8 +69,12 @@ It is a clock first — not a dashboard, not a productivity suite.
 
 ## Install
 
-Pre-built installers will be published on the
-[Releases page](https://github.com/WiseHax/TickPuff/releases). Until then, build from source.
+**Recommended: [get TickPuff from the Microsoft Store](https://apps.microsoft.com/detail/9NCCLZRSL5WV).**
+It's free, signed by Microsoft (no "unknown publisher" warning) and updates automatically.
+
+You can also download the installer from the [Releases page](https://github.com/WiseHax/TickPuff/releases).
+That installer isn't code-signed yet, so Windows SmartScreen may say it protected your PC: click
+**More info → Run anyway**.
 
 ## Build from source
 
