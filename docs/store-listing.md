@@ -36,8 +36,9 @@ TickPuff is free and open source (MIT): github.com/WiseHax/TickPuff
 
 ## What's new in this version
 
-A calmer layout: widgets now live in drawers, so you see just the clock, the world and your companion.
-Companions greet you when you return and dance to your music. New mini mode and tray menu.
+Seasons and the real sun: worlds change through the year and follow the actual sunrise and sunset where you
+live. Shooting stars, birds, fish and a passing train. Name your companion — your friendship grows as you pet
+it and focus together, unlocking a flower and a crown. A good-morning greeting and a weekly focus chart.
 
 ## Product features (one per line)
 
