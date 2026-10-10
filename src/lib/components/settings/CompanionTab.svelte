@@ -5,8 +5,14 @@
   import { activeTheme, activeThemeState, world } from '$lib/stores/world';
   import { effectiveWeather } from '$lib/stores/atmosphere';
   import { companionSize, ui } from '$lib/stores/settings';
+  import { ACCESSORY_LEVELS, LEVEL_NAMES, NAME_MAX_LENGTH, bonds, levelFor, levelProgress } from '$lib/stores/bond';
   import { weatherSettings } from '$lib/integrations/weather';
   import { COMPANION_SIZES, WEATHER_LABELS, type WeatherType } from '$lib/types';
+
+  const active = $derived($activeThemeState.companion);
+  const bond = $derived($bonds[active]);
+  const level = $derived(levelFor(bond?.points ?? 0));
+  const nextUnlock = $derived((Object.entries(ACCESSORY_LEVELS) as [string, number][]).find(([, at]) => at > level));
 
   const syncing = $derived($weatherSettings.syncAtmosphere && $weatherSettings.location !== null);
 </script>
@@ -25,6 +31,36 @@
     </button>
   {/each}
 </div>
+<div class="field">
+  <label class="field-label" for="companion-name">Name</label>
+  <input
+    id="companion-name"
+    type="text"
+    maxlength={NAME_MAX_LENGTH}
+    placeholder={COMPANIONS[active].name}
+    value={bond?.name ?? ''}
+    onchange={(e) => bonds.rename(active, e.currentTarget.value)}
+  />
+</div>
+<div class="field friendship">
+  <span class="field-label">
+    Friendship
+    <span class="hint">
+      {LEVEL_NAMES[level]}{nextUnlock ? ` · reach level ${nextUnlock[1]} for a ${nextUnlock[0]}` : ''}
+    </span>
+  </span>
+  <div
+    class="meter"
+    role="meter"
+    aria-label="Friendship"
+    aria-valuemin="0"
+    aria-valuemax="100"
+    aria-valuenow={Math.round(levelProgress(bond?.points ?? 0) * 100)}
+  >
+    <span style="width: {levelProgress(bond?.points ?? 0) * 100}%"></span>
+  </div>
+</div>
+<p class="hint">Grows when you pet {bond?.name ?? 'your companion'} and finish focus sessions. It never goes down.</p>
 <Switch label="Show companion" checked={$ui.companionVisible} onchange={(value) => ui.set('companionVisible', value)} />
 <div class="field">
   <span class="field-label" id="size-label">Size</span>
@@ -86,6 +122,23 @@
   .choice[aria-checked='true'] {
     border-color: var(--accent-color);
     background: rgba(255, 255, 255, 0.1);
+  }
+  .friendship {
+    gap: 1rem;
+  }
+  .meter {
+    flex: 0 0 160px;
+    height: 8px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.1);
+    overflow: hidden;
+  }
+  .meter span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: var(--accent-color);
+    transition: width 0.6s ease;
   }
   .note {
     margin-top: 0.7rem;
