@@ -1,7 +1,7 @@
 <script lang="ts">
   import type { SceneProps } from './index';
   import Sky from './parts/Sky.svelte';
-  import { BOTTOM, GROUND_Y, H, TOP, W, grass, mix, mountains, pineRow, ridge, specks } from './art';
+  import { BOTTOM, GROUND_Y, H, TOP, W, canopy, grass, mix, mountains, pineRow, ridge, rng, specks } from './art';
 
   let { time, season }: SceneProps = $props();
   const dark = $derived(time === 'night' || time === 'late-night');
@@ -26,7 +26,21 @@
   const haze = mix(TOP, BOTTOM, 60);
   const mid = mix(BOTTOM, '#0d2418', 75);
   const near = mix(BOTTOM, '#081a10', 45);
-  const floor = mix(BOTTOM, '#1d3a1a', 62);
+  const winter = $derived(season === 'winter');
+  const autumn = $derived(season === 'autumn');
+  const floor = $derived(winter ? mix('#e8eef5', BOTTOM, dark ? 45 : 78) : mix(BOTTOM, '#1d3a1a', 62));
+  /** Snow-capped pines in winter: white at the top of each row, the usual green below. */
+  const snowCap = (color: string, id: string) => (winter ? `url(#${id})` : color);
+
+  // Autumn: broadleaf trees among the pines, and fallen leaves instead of flowers.
+  const AUTUMN = ['#d9622b', '#e8a33a', '#b8452a', '#f2c14e'];
+  const leafRandom = rng(23);
+  const autumnTrees = Array.from({ length: 9 }, (_, i) => {
+    const x = 60 + i * 180 + leafRandom() * 90;
+    const r = 34 + leafRandom() * 26;
+    return { d: canopy(200 + i, x, 600 - r * 1.2, r * 1.3, r, 10), x, r, color: AUTUMN[i % AUTUMN.length] };
+  });
+  const LEAF_COLORS = ['#d9622b', '#e8a33a', '#b8452a', '#c9772f'];
   const ink = mix(BOTTOM, '#030806', 18);
 </script>
 
@@ -50,7 +64,15 @@
 
 <div class="world-layer" style="--depth: 12">
   <svg class="fill" viewBox="0 0 {W} {H}" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
-    <path d={farPines} style="fill: {mix(TOP, BOTTOM, 38)}" />
+    {#if winter}
+      <defs>
+        <linearGradient id="forest-snow-far" gradientUnits="userSpaceOnUse" x1="0" y1="420" x2="0" y2="560">
+          <stop offset="0.25" stop-color="#f4f8fc" />
+          <stop offset="0.7" style="stop-color: {mix(TOP, BOTTOM, 38)}" />
+        </linearGradient>
+      </defs>
+    {/if}
+    <path d={farPines} style="fill: {snowCap(mix(TOP, BOTTOM, 38), 'forest-snow-far')}" />
     <rect x="0" y="540" width={W} height="400" style="fill: {mix(TOP, BOTTOM, 38)}" />
   </svg>
   <div class="fog-band" style="--y: 58%; --o: {dark ? 0.18 : 0.32}"></div>
@@ -58,7 +80,21 @@
 
 <div class="world-layer" style="--depth: 20">
   <svg class="fill" viewBox="0 0 {W} {H}" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
-    <path d={midPines} style="fill: {mid}" />
+    {#if winter}
+      <defs>
+        <linearGradient id="forest-snow-mid" gradientUnits="userSpaceOnUse" x1="0" y1="400" x2="0" y2="620">
+          <stop offset="0.3" stop-color="#eef4fa" />
+          <stop offset="0.65" style="stop-color: {mid}" />
+        </linearGradient>
+      </defs>
+    {/if}
+    <path d={midPines} style="fill: {snowCap(mid, 'forest-snow-mid')}" />
+    {#if autumn}
+      {#each autumnTrees as tree, i (i)}
+        <rect x={tree.x - 4} y={600 - tree.r * 0.6} width="8" height={tree.r} style="fill: {mid}" />
+        <path d={tree.d} fill={tree.color} opacity={dark ? 0.55 : 0.95} />
+      {/each}
+    {/if}
     <rect x="0" y="598" width={W} height="400" style="fill: {mid}" />
   </svg>
   <div class="fog-band slow" style="--y: 66%; --o: {dark ? 0.14 : 0.26}"></div>
@@ -77,20 +113,40 @@
         <stop offset="1" stop-color="white" stop-opacity="0" />
       </radialGradient>
     </defs>
-    <path d={nearPines} style="fill: {near}" />
+    {#if winter}
+      <linearGradient id="forest-snow-near" gradientUnits="userSpaceOnUse" x1="0" y1="330" x2="0" y2="660">
+        <stop offset="0.25" stop-color="#e9f0f7" />
+        <stop offset="0.6" style="stop-color: {near}" />
+      </linearGradient>
+    {/if}
+    <path d={nearPines} style="fill: {snowCap(near, 'forest-snow-near')}" />
     <path d={ground} fill="url(#forest-floor)" />
     <ellipse cx="960" cy="735" rx="520" ry="70" fill="url(#forest-clearing)" />
     <path d={groundBlades} style="fill: {mix(floor, 'var(--accent-color)', 80)}" />
     <path d={tufts} style="fill: {mix(floor, '#000', 70)}" />
-    {#each flowers as flower, i (i)}
-      <circle
-        cx={flower.x}
-        cy={flower.y}
-        r={flower.r}
-        fill={FLOWER_COLORS[Math.floor(flower.hue * FLOWER_COLORS.length)]}
-        opacity={dark ? 0.35 : 0.85}
-      />
-    {/each}
+    {#if autumn}
+      {#each flowers as leaf, i (i)}
+        <ellipse
+          cx={leaf.x}
+          cy={leaf.y}
+          rx={leaf.r * 1.4}
+          ry={leaf.r * 0.7}
+          transform="rotate({leaf.hue * 180} {leaf.x} {leaf.y})"
+          fill={LEAF_COLORS[Math.floor(leaf.hue * LEAF_COLORS.length)]}
+          opacity={dark ? 0.4 : 0.9}
+        />
+      {/each}
+    {:else if !winter}
+      {#each flowers as flower, i (i)}
+        <circle
+          cx={flower.x}
+          cy={flower.y}
+          r={flower.r}
+          fill={FLOWER_COLORS[Math.floor(flower.hue * FLOWER_COLORS.length)]}
+          opacity={dark ? 0.35 : 0.85}
+        />
+      {/each}
+    {/if}
     <!-- Mossy boulders. -->
     {#each [{ x: 300, y: 812, s: 1 }, { x: 395, y: 826, s: 0.55 }, { x: 1455, y: 800, s: 0.8 }] as rock, i (i)}
       <g transform="translate({rock.x} {rock.y}) scale({rock.s})">
