@@ -2,9 +2,17 @@
   import { THEMES } from '$lib/themes/registry';
   import { world } from '$lib/stores/world';
   import { timeOfDay } from '$lib/core/time/clock';
+  import { weatherSettings } from '$lib/integrations/weather';
 </script>
 
 <p class="hint">Each world remembers its own companion and atmosphere.</p>
+<p class="hint">
+  {#if $weatherSettings.location}
+    Day and night follow the real sunrise and sunset in {$weatherSettings.location.name}.
+  {:else}
+    Day and night follow your clock. Set a weather location (Integrations) to follow the real sunrise and sunset.
+  {/if}
+</p>
 <div class="grid" role="radiogroup" aria-label="World">
   {#each THEMES as theme (theme.id)}
     {@const colors = theme.colors[$timeOfDay]}
