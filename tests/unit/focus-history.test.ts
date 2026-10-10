@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { addDays, computeStreak, emptyHistory, recordCompletion } from '$lib/features/focus/history';
+import { addDays, computeStreak, emptyHistory, recentDays, recordCompletion } from '$lib/features/focus/history';
 import { migrateLegacyProgress, sanitizeHistory, sanitizeSession } from '$lib/stores/focus';
 import type { FocusHistory } from '$lib/types';
 
@@ -77,5 +77,26 @@ describe('focus persistence', () => {
     expect(sanitizeSession({ phase: 'focus', status: 'paused', elapsedMs: 1000, durationMs: 1_500_000 })?.status).toBe(
       'paused',
     );
+  });
+});
+
+describe('recentDays', () => {
+  it('returns the last seven days oldest first, with zeros for quiet days', () => {
+    const history: FocusHistory = {
+      days: { '2026-10-10': { sessions: 2, minutes: 50 }, '2026-10-07': { sessions: 1, minutes: 25 } },
+      carryOver: null,
+    };
+    const week = recentDays(history, '2026-10-10');
+    expect(week.map((d) => d.key)).toEqual([
+      '2026-10-04',
+      '2026-10-05',
+      '2026-10-06',
+      '2026-10-07',
+      '2026-10-08',
+      '2026-10-09',
+      '2026-10-10',
+    ]);
+    expect(week.map((d) => d.minutes)).toEqual([0, 0, 0, 25, 0, 0, 50]);
+    expect(week[6].weekday).toBe(6); // 2026-10-10 is a Saturday
   });
 });
