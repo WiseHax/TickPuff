@@ -8,7 +8,7 @@ import { emit } from '$lib/core/events/bus';
 import { playChime } from '$lib/core/platform/sound';
 import { localDateKey, today } from '$lib/core/time/clock';
 import * as timer from '$lib/features/focus/timer';
-import { computeStreak, dayStats, emptyHistory, recordCompletion } from '$lib/features/focus/history';
+import { computeStreak, dayStats, emptyHistory, recentDays, recordCompletion } from '$lib/features/focus/history';
 import type { FocusConfig, FocusHistory, FocusPhase, FocusSession } from '$lib/types';
 
 const PHASES: readonly FocusPhase[] = ['focus', 'short-break', 'long-break'];
@@ -190,5 +190,8 @@ export const focusView = derived([focusSession, nowMs], ([$session, $now]) => ({
 export const focusActive = derived(focusSession, ($s) => $s.phase === 'focus' && $s.status === 'running');
 
 export const todayFocus = derived([focusHistory, today], ([$history, $today]) => dayStats($history, $today));
+
+/** The last seven days of focus, for the weekly chart. */
+export const focusWeek = derived([focusHistory, today], ([$history, $today]) => recentDays($history, $today));
 
 export const focusStreak = derived([focusHistory, today], ([$history, $today]) => computeStreak($history, $today));

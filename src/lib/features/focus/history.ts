@@ -46,6 +46,14 @@ export function dayStats(history: FocusHistory, key: string) {
   return history.days[key] ?? { sessions: 0, minutes: 0 };
 }
 
+/** Focus minutes for the last `count` days ending today, oldest first. */
+export function recentDays(history: FocusHistory, todayKey: string, count = 7) {
+  return Array.from({ length: count }, (_, i) => {
+    const key = addDays(todayKey, i - (count - 1));
+    return { key, minutes: dayStats(history, key).minutes, weekday: parseDateKey(key).getDay() };
+  });
+}
+
 /**
  * Consecutive days with at least one completed focus session, ending today
  * (or yesterday — a streak isn't broken until a full day is missed).
