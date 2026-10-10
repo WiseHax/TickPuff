@@ -5,6 +5,7 @@
   import { ambientEffects, effectiveWeather } from '$lib/stores/atmosphere';
   import { performanceProfile, ui } from '$lib/stores/settings';
   import { timeOfDay } from '$lib/core/time/clock';
+  import { season } from '$lib/stores/season';
   import { rendererStatus } from '$lib/companion/status';
   import WeatherFallback from './WeatherFallback.svelte';
 
@@ -55,7 +56,7 @@
 >
   {#key $activeTheme.id}
     <div class="scene">
-      <Scene time={$timeOfDay} />
+      <Scene time={$timeOfDay} season={$season} />
     </div>
   {/key}
   <WeatherFallback weather={$effectiveWeather} ambient={$ambientEffects} fogOnly={!cssWeather} />

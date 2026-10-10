@@ -1,9 +1,9 @@
 <script lang="ts">
-  import type { TimeOfDay } from '$lib/types';
+  import type { SceneProps } from './index';
   import Sky from './parts/Sky.svelte';
   import { BOTTOM, GROUND_Y, H, TOP, W, grass, mix, mountains, pineRow, ridge, specks } from './art';
 
-  let { time }: { time: TimeOfDay } = $props();
+  let { time, season }: SceneProps = $props();
   const dark = $derived(time === 'night' || time === 'late-night');
 
   // Static geometry: computed once per mount.

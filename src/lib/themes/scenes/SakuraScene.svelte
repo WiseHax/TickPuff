@@ -1,9 +1,9 @@
 <script lang="ts">
-  import type { TimeOfDay } from '$lib/types';
+  import type { SceneProps } from './index';
   import Sky from './parts/Sky.svelte';
   import { BOTTOM, GROUND_Y, H, TOP, W, canopy, grass, mix, ridge, rng, specks } from './art';
 
-  let { time }: { time: TimeOfDay } = $props();
+  let { time }: SceneProps = $props();
   const dark = $derived(time === 'night' || time === 'late-night');
   const lit = $derived(dark || time === 'sunset');
 

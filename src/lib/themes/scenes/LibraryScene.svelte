@@ -1,8 +1,9 @@
 <script lang="ts">
   import type { TimeOfDay } from '$lib/types';
+  import type { SceneProps } from './index';
   import { BOTTOM, GROUND_Y, H, TOP, W, mix, rng, starField } from './art';
 
-  let { time }: { time: TimeOfDay } = $props();
+  let { time }: SceneProps = $props();
   const dark = $derived(time === 'night' || time === 'late-night');
   const candleLit = $derived(dark || time === 'sunset');
 
