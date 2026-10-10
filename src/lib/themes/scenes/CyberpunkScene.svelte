@@ -99,6 +99,14 @@
 </div>
 
 <div class="world-layer" style="--depth: 14">
+  <!-- Elevated train gliding past every so often. -->
+  <div class="train" class:lit={neonOn} aria-hidden="true">
+    {#each [0, 1, 2, 3] as car (car)}
+      <span class="car"
+        >{#each [0, 1, 2, 3, 4] as w (w)}<i></i>{/each}</span
+      >
+    {/each}
+  </div>
   <div class="traffic">
     {#each traffic as car, i (i)}
       <span
@@ -331,6 +339,46 @@
   .neon-sign.on .neon-sub {
     color: #b8ffff;
     text-shadow: 0 0 8px #0ff;
+  }
+  .train {
+    position: absolute;
+    z-index: 1; /* in front of the mid skyline */
+    top: 55%;
+    left: 0;
+    display: flex;
+    gap: 4px;
+    animation: train 34s linear infinite;
+    animation-delay: -12s;
+  }
+  .car {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    padding: 0 10px;
+    width: 130px;
+    height: 22px;
+    border-radius: 6px 6px 3px 3px;
+    background: #141020;
+    border-bottom: 3px solid #ff4fd8;
+  }
+  .car i {
+    flex: 1;
+    height: 8px;
+    border-radius: 2px;
+    background: #2a2440;
+  }
+  .train.lit .car i {
+    background: #ffe7b0;
+    box-shadow: 0 0 6px rgba(255, 220, 150, 0.7);
+  }
+  @keyframes train {
+    0% {
+      transform: translateX(-620px);
+    }
+    40%,
+    100% {
+      transform: translateX(110vw);
+    }
   }
   @keyframes fly {
     to {
