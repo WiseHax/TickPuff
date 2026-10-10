@@ -127,6 +127,20 @@ over the companion each frame. Hovering it makes the companion look at the curso
 with <kbd>Tab</kbd> and pressing <kbd>Enter</kbd>) pokes it. The button's accessible label describes what the
 companion is doing.
 
+## Friendship
+
+`stores/bond.ts` keeps a bond per companion: an optional **name** and **friendship points**. Points come from
+petting (counted up to `DAILY_PET_CAP` times a day, so clicking repeatedly doesn't farm points) and finished
+focus sessions; they never go down. Points map to six levels (`LEVEL_THRESHOLDS`, `LEVEL_NAMES`), shown in
+Settings → Companion.
+
+Levels unlock accessories (`ACCESSORY_LEVELS`): a flower, then a crown. `models/accessories.ts` places them on
+top of the head of any companion, procedural or GLB, from the head's bounding box (ears excluded), and the
+renderer re-attaches them when the companion changes (`CompanionRenderer.setAccessories`).
+
+The first time TickPuff opens each day, the companion runs over to say good morning (`stores/greeting.ts`
+remembers the day). It also greets the user after three or more minutes away.
+
 ## Adding a companion
 
 1. Build a model: a procedural builder returning a `CompanionRig`, or a GLB file with a procedural fallback.
