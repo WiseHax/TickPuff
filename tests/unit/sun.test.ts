@@ -61,3 +61,20 @@ describe('timeOfDayFromSun', () => {
     expect(timeOfDayByHour(day(23))).toBe('late-night');
   });
 });
+
+describe('timeOfDayFor with a location', () => {
+  it('follows the real sun when a location is known, and the clock otherwise', async () => {
+    const { timeOfDayFor } = await import('$lib/core/time/clock');
+    const date = (h: number, m = 0) => new Date(2026, 2, 20, h, m); // equinox: ~12 h of daylight everywhere
+    // A place on the equator whose solar noon is local 12:00 in this machine's timezone:
+    // sunrise ≈ 06:00 and sunset ≈ 18:00 local, whatever timezone the tests run in.
+    const here = { latitude: 0, longitude: -date(12).getTimezoneOffset() / 4 };
+
+    expect(timeOfDayFor(date(18, 20), here)).toBe('sunset'); // dusk right after sunset
+    expect(timeOfDayFor(date(18, 20))).toBe('sunset'); // the clock agrees (17–20)
+    expect(timeOfDayFor(date(19, 30), here)).toBe('night'); // the sun has been down 1.5 h…
+    expect(timeOfDayFor(date(19, 30))).toBe('sunset'); // …but the clock still says sunset
+    expect(timeOfDayFor(date(7, 0), here)).toBe('morning');
+    expect(timeOfDayFor(date(12, 0), here)).toBe('day');
+  });
+});
