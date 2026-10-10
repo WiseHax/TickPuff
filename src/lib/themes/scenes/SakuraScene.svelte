@@ -3,9 +3,18 @@
   import Sky from './parts/Sky.svelte';
   import { BOTTOM, GROUND_Y, H, TOP, W, canopy, grass, mix, ridge, rng, specks } from './art';
 
-  let { time }: SceneProps = $props();
+  let { time, season }: SceneProps = $props();
   const dark = $derived(time === 'night' || time === 'late-night');
   const lit = $derived(dark || time === 'sunset');
+
+  /** Tree colours through the year: blossoms, summer leaves, momiji, snow. */
+  const FOLIAGE = {
+    spring: { inner: '#ffd9e6', outer: '#f48fb1', light: '#ffe4ee', grove: '#ffb7cf', ground: ['#ffc4d6', '#ffe0ea'] },
+    summer: { inner: '#bfe6a0', outer: '#5f9e4f', light: '#d8f2c4', grove: '#7fb069', ground: [] },
+    autumn: { inner: '#ffc46b', outer: '#d9542b', light: '#ffdca0', grove: '#e07a3a', ground: ['#e8743a', '#f2b04e'] },
+    winter: { inner: '#ffffff', outer: '#d6e0ec', light: '#ffffff', grove: '#e6edf5', ground: [] },
+  } as const;
+  const foliage = $derived(FOLIAGE[season]);
 
   // A Fuji-like volcano: broad slopes with a flattened summit.
   const fuji = 'M180,600 C360,520 520,330 640,232 C660,218 700,214 720,226 C850,320 1000,500 1220,600 Z';
@@ -37,7 +46,13 @@
   const far = $derived(dark ? mix(TOP, '#7a6a9a', 70) : mix(TOP, 'white', 70));
   const hillColor = mix(BOTTOM, TOP, 55);
   const nearHill = mix(BOTTOM, '#7a5a7a', 70);
-  const floor = $derived(dark ? mix(BOTTOM, '#2a3a2a', 60) : mix('#9fc58f', BOTTOM, 55));
+  const floor = $derived(
+    season === 'winter'
+      ? mix('#eef3f8', BOTTOM, dark ? 40 : 80)
+      : dark
+        ? mix(BOTTOM, '#2a3a2a', 60)
+        : mix(season === 'summer' ? '#8fc67a' : '#9fc58f', BOTTOM, 55),
+  );
   const ink = mix(BOTTOM, '#1a0f16', 30);
 </script>
 
@@ -55,7 +70,7 @@
     <path d={fujiSnow} style="fill: {mix('white', TOP, dark ? 50 : 92)}" />
     <path d={hills} style="fill: {hillColor}" />
     {#each grove as tree, i (i)}
-      <path d={tree.d} style="fill: {mix('#ffb7cf', hillColor, dark ? 30 : 55)}" />
+      <path d={tree.d} style="fill: {mix(foliage.grove, hillColor, dark ? 30 : 55)}" />
     {/each}
   </svg>
   <div class="mist" style="--o: {dark ? 0.12 : 0.35}"></div>
@@ -98,16 +113,18 @@
     {#each [[800, 880, 46], [780, 810, 38], [800, 752, 30], [790, 706, 24], [800, 672, 18]] as [x, y, r], i (i)}
       <ellipse cx={x} cy={y} rx={r * 1.6} ry={r * 0.45} style="fill: {mix(TOP, '#7a7080', 30)}" opacity="0.85" />
     {/each}
-    {#each petalsOnGround as petal, i (i)}
-      <ellipse
-        cx={petal.x}
-        cy={petal.y}
-        rx={petal.r}
-        ry={petal.r * 0.6}
-        fill={petal.hue > 0.5 ? '#ffc4d6' : '#ffe0ea'}
-        opacity={dark ? 0.35 : 0.9}
-      />
-    {/each}
+    {#if foliage.ground.length > 0}
+      {#each petalsOnGround as petal, i (i)}
+        <ellipse
+          cx={petal.x}
+          cy={petal.y}
+          rx={petal.r}
+          ry={petal.r * 0.6}
+          fill={foliage.ground[petal.hue > 0.5 ? 0 : 1]}
+          opacity={dark ? 0.35 : 0.9}
+        />
+      {/each}
+    {/if}
   </svg>
 
   <!-- Torii gate behind the stage centre (the "Torii gate" zone). -->
@@ -131,8 +148,8 @@
   <svg class="fill" viewBox="0 0 {W} {H}" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
     <defs>
       <radialGradient id="sakura-bloom" cx="0.4" cy="0.3" r="0.8">
-        <stop offset="0" stop-color="#ffd9e6" />
-        <stop offset="1" stop-color="#f48fb1" />
+        <stop offset="0" stop-color={foliage.inner} />
+        <stop offset="1" stop-color={foliage.outer} />
       </radialGradient>
     </defs>
     <!-- The big cherry tree on the right (the "Under the blossoms" zone). -->
@@ -140,8 +157,8 @@
       d="M1420,900 C1400,760 1430,640 1380,520 C1350,450 1300,400 1240,360 L1260,340 C1320,370 1360,410 1400,470 C1420,400 1450,330 1520,280 L1540,300 C1480,360 1460,430 1450,520 C1470,620 1480,760 1500,900 Z"
       style="fill: {mix('#4a2a2a', BOTTOM, 70)}"
     />
-    <path d={bigTree} fill="url(#sakura-bloom)" opacity={dark ? 0.75 : 0.95} />
-    <path d={bigTreeLight} fill="#ffe4ee" opacity={dark ? 0.25 : 0.5} />
+    <path d={bigTree} fill="url(#sakura-bloom)" opacity={season === 'winter' ? 0.55 : dark ? 0.75 : 0.95} />
+    <path d={bigTreeLight} fill={foliage.light} opacity={dark ? 0.25 : 0.5} />
     <!-- Overhanging branch top-left frames the clock. -->
     <path
       d="M-20,120 C120,140 240,170 360,230 M140,150 C180,200 200,240 190,290"
