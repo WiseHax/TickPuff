@@ -5,6 +5,7 @@
 import { get, writable } from 'svelte/store';
 import { asBoolean, asOneOf, isRecord, persisted, type PersistSpec } from '$lib/core/persistence';
 import { createPoller, createSharedLifecycle } from '$lib/core/scheduling/poller';
+import { setObserver } from '$lib/core/time/clock';
 import { fetchForecast } from './openMeteo';
 import type { IntegrationStatus, TemperatureUnit, WeatherLocation, WeatherReport } from '$lib/types';
 
@@ -48,6 +49,9 @@ export const weatherSettingsSpec: PersistSpec<WeatherSettings> = {
 };
 
 export const weatherSettings = persisted(weatherSettingsSpec);
+
+// With a location set, the world's time of day follows the real sunrise and sunset there.
+weatherSettings.subscribe((settings) => setObserver(settings.location));
 
 export interface WeatherState {
   status: IntegrationStatus;

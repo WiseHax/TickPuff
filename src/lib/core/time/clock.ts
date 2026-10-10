@@ -1,4 +1,5 @@
-import { derived, readable } from 'svelte/store';
+import { derived, readable, writable } from 'svelte/store';
+import { sunTimes, timeOfDayByHour, timeOfDayFromSun } from './sun';
 import { TIMES_OF_DAY, type TimeOfDay } from '$lib/types';
 
 /**
@@ -27,13 +28,27 @@ export const now = readable(new Date(), (set) => {
   };
 });
 
-export function timeOfDayFor(date: Date): TimeOfDay {
-  const hour = date.getHours();
-  if (hour >= 5 && hour < 9) return 'morning';
-  if (hour >= 9 && hour < 17) return 'day';
-  if (hour >= 17 && hour < 20) return 'sunset';
-  if (hour >= 20 && hour < 23) return 'night';
-  return 'late-night';
+/** Where the user is, for following the real sun (null = use clock hours). */
+export interface Observer {
+  latitude: number;
+  longitude: number;
+}
+
+const observer = writable<Observer | null>(null);
+
+/** Set by the weather integration when the user picks (or clears) a location. */
+export function setObserver(location: Observer | null): void {
+  observer.set(location ? { latitude: location.latitude, longitude: location.longitude } : null);
+}
+
+let cache: { key: string; sun: ReturnType<typeof sunTimes> } | null = null;
+
+/** Time of day from the real sun when a location is known, otherwise from clock hours. */
+export function timeOfDayFor(date: Date, at: Observer | null = null): TimeOfDay {
+  if (!at) return timeOfDayByHour(date);
+  const key = `${localDateKey(date)}@${at.latitude.toFixed(2)},${at.longitude.toFixed(2)}`;
+  if (cache?.key !== key) cache = { key, sun: sunTimes(date, at.latitude, at.longitude) };
+  return timeOfDayFromSun(date, cache.sun);
 }
 
 /** Dev builds only: preview a time of day with `?time=night` (any TimeOfDay). */
@@ -46,8 +61,8 @@ function devTimeOverride(): TimeOfDay | null {
 const override = devTimeOverride();
 
 export const timeOfDay = derived(
-  now,
-  ($now, set) => set(override ?? timeOfDayFor($now)),
+  [now, observer],
+  ([$now, $observer], set) => set(override ?? timeOfDayFor($now, $observer)),
   override ?? timeOfDayFor(new Date()),
 );
 
