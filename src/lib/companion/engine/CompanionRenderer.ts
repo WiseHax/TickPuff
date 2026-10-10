@@ -24,7 +24,9 @@ import { BehaviorController } from '../behavior/BehaviorController';
 import { InteractionController } from '../interaction/InteractionController';
 import { Navigator, type Vec3 } from '../navigation/Navigator';
 import { StageMapper } from '../navigation/StageMapper';
-import { companionLook } from '../models/parts';
+import { attachAccessories } from '../models/accessories';
+import { companionLook, disposeObject } from '../models/parts';
+import type { Accessory } from '$lib/stores/bond';
 import { loadGltfCompanion, loadProceduralCompanion, type LoadedCompanion } from './CompanionLoader';
 
 export interface WorldContext {
@@ -46,6 +48,8 @@ export interface RendererOptions {
   profile: PerformanceProfile;
   /** World-space size multiplier for the companion (the Companion size setting). */
   size?: number;
+  /** Called when the user pets the companion (click or keyboard). */
+  onPet?: () => void;
   /** Called when the companion starts a new activity. */
   onStateChange?: (state: CompanionState) => void;
   /** Position to continue from (e.g. after the renderer is recreated). */
@@ -110,6 +114,8 @@ export class CompanionRenderer {
 
   private profile: PerformanceProfile;
   private size: number;
+  private accessories: Accessory[] = [];
+  private accessoryGroup: THREE.Group | null = null;
   private world: WorldContext | null = null;
   private companion: LoadedCompanion | null = null;
   private loadToken = 0;
@@ -172,7 +178,10 @@ export class CompanionRenderer {
     else this.placeAtStageCenter = true;
 
     this.interaction = new InteractionController(options.hitbox, {
-      onPoke: () => this.behavior.poke(),
+      onPoke: () => {
+        this.behavior.poke();
+        this.options.onPet?.();
+      },
       onHoverChange: () => undefined,
     });
 
@@ -191,6 +200,22 @@ export class CompanionRenderer {
     this.profile = profile;
     this.effects.setDensity(profile.particleDensity);
     this.resize();
+  }
+
+  /** Accessories earned through friendship, shown on the companion's head. */
+  setAccessories(accessories: Accessory[]) {
+    if (accessories.join() === this.accessories.join()) return;
+    this.accessories = [...accessories];
+    this.applyAccessories();
+  }
+
+  private applyAccessories() {
+    if (this.accessoryGroup) {
+      this.accessoryGroup.removeFromParent();
+      disposeObject(this.accessoryGroup);
+      this.accessoryGroup = null;
+    }
+    if (this.companion) this.accessoryGroup = attachAccessories(this.companion.rig, this.accessories);
   }
 
   /** Change the companion's size (world-space multiplier). */
@@ -278,12 +303,14 @@ export class CompanionRenderer {
   }
 
   private install(loaded: LoadedCompanion, animateSpawn = true) {
+    this.accessoryGroup = null; // disposed with the old rig
     this.companion?.dispose();
     this.actor.clear();
     this.companion = loaded;
     loaded.rig.root.scale.setScalar(loaded.definition.scale);
     this.actor.add(loaded.rig.root);
     this.behavior.setPersonality(loaded.definition.personality);
+    this.applyAccessories();
     if (animateSpawn) this.spawn = 0;
     this.lastActivity = null;
     // Keep the current altitude sensible for the new companion's range.
