@@ -5,6 +5,7 @@
 import { describe, expect, it, vi } from 'vitest';
 import * as THREE from 'three';
 import { PROCEDURAL_MODELS, buildProcedural } from '$lib/companion/models/procedural';
+import { attachAccessories } from '$lib/companion/models/accessories';
 import { disposeObject } from '$lib/companion/models/parts';
 import { COMPANION_SIZE_SCALE, companionSizeSpec } from '$lib/stores/settings';
 import { COMPANION_SIZES, type ProceduralModelId } from '$lib/types';
@@ -131,5 +132,41 @@ describe('scenery generators', () => {
       expect(star.x).toBeLessThanOrEqual(W);
       expect(star.y).toBeLessThanOrEqual(400);
     }
+  });
+});
+
+describe('friendship accessories', () => {
+  it('sit on top of every companion head and are released with the model', () => {
+    for (const id of MODEL_IDS) {
+      const rig = buildProcedural(id);
+      const group = attachAccessories(rig, ['flower', 'crown']);
+      expect(group, id).not.toBeNull();
+      expect(group?.parent).toBe(rig.head);
+      expect(group?.children).toHaveLength(2);
+
+      // Above the head's centre, and every value finite.
+      rig.root.updateMatrixWorld(true);
+      const headCentre = new THREE.Vector3();
+      rig.head.getWorldPosition(headCentre);
+      for (const piece of group?.children ?? []) {
+        const at = new THREE.Vector3();
+        piece.getWorldPosition(at);
+        expect(at.toArray().every(Number.isFinite), id).toBe(true);
+        expect(at.y, id).toBeGreaterThan(headCentre.y);
+      }
+
+      const geometries = new Set(meshes(rig.root).map((m) => m.geometry));
+      const disposed = vi.fn();
+      for (const geometry of geometries) geometry.addEventListener('dispose', disposed);
+      disposeObject(rig.root);
+      expect(disposed).toHaveBeenCalledTimes(geometries.size);
+    }
+  });
+
+  it('adds nothing when no accessory is unlocked', () => {
+    const rig = buildProcedural('cat');
+    const before = rig.head.children.length;
+    expect(attachAccessories(rig, [])).toBeNull();
+    expect(rig.head.children).toHaveLength(before);
   });
 });
