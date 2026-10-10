@@ -121,3 +121,23 @@ textarea {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Segmented control (settings): a row of radio buttons styled as one pill. */
+.segmented {
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 2px;
+  padding: 2px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.06);
+}
+.segmented button {
+  padding: 0.35rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  text-transform: capitalize;
+}
+.segmented button[aria-checked='true'] {
+  background: var(--accent-color);
+  color: #fff;
+}

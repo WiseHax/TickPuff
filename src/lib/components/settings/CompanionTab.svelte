@@ -87,23 +87,6 @@
     border-color: var(--accent-color);
     background: rgba(255, 255, 255, 0.1);
   }
-  .segmented {
-    display: inline-flex;
-    gap: 2px;
-    padding: 2px;
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.06);
-  }
-  .segmented button {
-    padding: 0.35rem 0.9rem;
-    border-radius: 6px;
-    font-size: 0.85rem;
-    text-transform: capitalize;
-  }
-  .segmented button[aria-checked='true'] {
-    background: var(--accent-color);
-    color: #fff;
-  }
   .note {
     margin-top: 0.7rem;
   }
