@@ -103,7 +103,23 @@ Rules that keep scenery cheap:
   window so they line up with the stage at any aspect ratio.
 - Don't put weather in scenes: atmosphere is rendered by the effects layer.
 
-In development, preview any time of day with `?time=night` (or `morning`, `day`, `sunset`, `late-night`).
+In development, preview any time of day with `?time=night` (or `morning`, `day`, `sunset`, `late-night`) and
+any season with `?season=winter` (or `spring`, `summer`, `autumn`); they combine: `?time=sunset&season=autumn`.
+
+### Props, seasons and clickable lights
+
+Every scene receives `SceneProps`: `time` and `season`. The season comes from `stores/season.ts`: by calendar
+month (meteorological seasons, flipped south of the equator when a weather location is set), or the season the
+user pinned in Settings → World. Use it for foliage and ground colours, snow and fallen leaves; keep the scene's
+layout the same in every season so zones still line up.
+
+`parts/switchable.svelte.ts` makes a light follow the time of day until the user clicks it. Give the element
+the `clickable` class (the world layer otherwise ignores the pointer) and `onclick={light.toggle}`.
+
+### Time of day
+
+`core/time/sun.ts` calculates sunrise and sunset (NOAA equations). When the user has a weather location,
+`timeOfDay` follows the real sun there (`timeOfDayFromSun`); otherwise it uses clock hours.
 
 ## Checklist for changes to a world
 
