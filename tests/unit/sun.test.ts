@@ -78,3 +78,20 @@ describe('timeOfDayFor with a location', () => {
     expect(timeOfDayFor(date(12, 0), here)).toBe('day');
   });
 });
+
+describe('seasonFor', () => {
+  it('uses meteorological seasons in the northern hemisphere', async () => {
+    const { seasonFor } = await import('$lib/core/time/season');
+    expect(seasonFor(new Date(2026, 0, 15))).toBe('winter');
+    expect(seasonFor(new Date(2026, 3, 15))).toBe('spring');
+    expect(seasonFor(new Date(2026, 6, 15))).toBe('summer');
+    expect(seasonFor(new Date(2026, 9, 15))).toBe('autumn');
+    expect(seasonFor(new Date(2026, 11, 1), 51.5)).toBe('winter');
+  });
+
+  it('flips the season south of the equator', async () => {
+    const { seasonFor } = await import('$lib/core/time/season');
+    expect(seasonFor(new Date(2026, 6, 15), -33.9)).toBe('winter'); // Sydney in July
+    expect(seasonFor(new Date(2026, 11, 25), -33.9)).toBe('summer');
+  });
+});
