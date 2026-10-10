@@ -3,19 +3,20 @@
 A realistic view of where TickPuff is going. Nothing here is a promise or a date; priorities shift with
 feedback. The guiding rule doesn't change: **a calm clock with a living world first, optional tools second.**
 
-## Now — polishing 0.1
+## Now
 
-- Windows installers on GitHub Releases.
 - Keyboard and screen-reader pass over every widget and the settings panel.
+- Signed installers on GitHub Releases (SignPath Foundation), alongside the Microsoft Store.
 - Fixes for issues reported by early users.
 
 ## Next
 
 - **Sculpted companion art** — optionally swap the procedural models for sculpted GLB models with animation
   clips, one companion at a time, under licenses compatible with the project (the loader already supports this).
-- **Window options** — always on top, start with Windows, remember window size and position.
+- **Window options** — remember window size and position.
 - **Ambient audio** — optional per-world soundscapes (needs openly licensed recordings).
 - **More scene interactions** — new zones only where a world's scenery already has the object.
+- **More accessories and friendship moments** — gentle, never a reason to feel guilty for not opening the app.
 
 ## Experimental
 

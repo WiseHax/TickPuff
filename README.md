@@ -38,8 +38,8 @@ It is a clock first — not a dashboard, not a productivity suite.
 | | |
 | --- | --- |
 | **Clock** | Large customizable clock and date: five bundled fonts (or the world's own), size, weight, spacing, colour, seconds, 12/24-hour. |
-| **Worlds** | Five themed worlds — Cozy Forest, Sakura Dream, Deep Aquarium, Cyber City, Magic Library — whose colours follow the time of day. Each world remembers its own companion and atmosphere. |
-| **3D companion** | A companion that roams the world, visits spots like the pine tree or the candle, sleeps, stretches, plays, looks at your cursor, celebrates finished focus sessions, greets you when you come back and dances to your music. Eleven detailed, cel-shaded companions across the worlds, in three sizes. |
+| **Worlds** | Five themed worlds — Cozy Forest, Sakura Dream, Deep Aquarium, Cyber City, Magic Library — that follow the time of day (the real sunrise and sunset if you set a location) and the seasons: snow in winter, autumn leaves, cherry blossoms in spring. Birds, shooting stars, fish and a passing train bring them to life, and you can click the lanterns and lights. |
+| **3D companion** | A companion that roams the world, visits spots like the pine tree or the candle, sleeps, stretches, plays, looks at your cursor, celebrates finished focus sessions, greets you when you come back and dances to your music. Name it, and your friendship grows as you pet it and focus together — unlocking a flower and a crown. Eleven detailed, cel-shaded companions across the worlds, in three sizes. |
 | **Atmosphere** | GPU particle rain, snow, petals, leaves, bubbles, dust, fireflies and sparks, plus soft fog. Optionally follows your real local weather. |
 | **Focus** | Pomodoro timer with short and long breaks, custom durations, auto-start, a chime and a daily streak. Timestamp-based, so it never drifts. |
 | **Tasks, notes, countdown, calendar, daily summary** | Small local tools, each an independent widget. |
