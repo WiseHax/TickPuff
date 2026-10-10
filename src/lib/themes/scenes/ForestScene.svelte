@@ -1,10 +1,13 @@
 <script lang="ts">
   import type { SceneProps } from './index';
   import Sky from './parts/Sky.svelte';
+  import { switchable } from './parts/switchable.svelte';
   import { BOTTOM, GROUND_Y, H, TOP, W, canopy, grass, mix, mountains, pineRow, ridge, rng, specks } from './art';
 
   let { time, season }: SceneProps = $props();
   const dark = $derived(time === 'night' || time === 'late-night');
+  const lantern = switchable(() => dark || time === 'sunset');
+  let bouncing = $state(false);
 
   // Static geometry: computed once per mount.
   const peaks = mountains(11, 430, 230, 4);
@@ -178,7 +181,15 @@
   </svg>
 
   <!-- Mushrooms by the stage's "mushrooms" zone (x ≈ 0.37). -->
-  <svg class="prop mushrooms" class:glowing={dark} viewBox="0 0 120 80" aria-hidden="true">
+  <svg
+    class="prop mushrooms clickable"
+    class:glowing={dark}
+    class:bouncing
+    viewBox="0 0 120 80"
+    aria-hidden="true"
+    onclick={() => (bouncing = true)}
+    onanimationend={() => (bouncing = false)}
+  >
     <ellipse cx="60" cy="76" rx="50" ry="5" fill="black" opacity="0.25" />
     <g class="cap-glow"><ellipse cx="44" cy="40" rx="34" ry="24" /></g>
     <path d="M40,76 C38,60 40,48 44,40 L52,40 C54,50 54,62 54,76 Z" fill="#f2e8d8" />
@@ -194,7 +205,7 @@
   </svg>
 
   <!-- Lantern hanging from the pine by the "Under the pine" zone. -->
-  <div class="prop lantern" class:lit={dark || time === 'sunset'}>
+  <div class="prop lantern clickable" class:lit={lantern.on} onclick={lantern.toggle} aria-hidden="true">
     <svg viewBox="0 0 40 90" aria-hidden="true">
       <path d="M20,0 L20,24" stroke="#20140c" stroke-width="2" />
       <path d="M10,30 L30,30 L27,24 L13,24 Z" fill="#2a1d14" />
@@ -234,6 +245,18 @@
     left: 30.5%;
     bottom: 12.5%;
     width: clamp(70px, 8vw, 130px);
+  }
+  .mushrooms.bouncing {
+    transform-origin: 50% 100%;
+    animation: boing 0.6s ease;
+  }
+  @keyframes boing {
+    30% {
+      transform: scale(1.12, 0.85);
+    }
+    60% {
+      transform: scale(0.94, 1.1);
+    }
   }
   .cap-glow {
     fill: #ffb27a;

@@ -141,3 +141,9 @@ textarea {
   background: var(--accent-color);
   color: #fff;
 }
+
+/* Scenery the user can click (lanterns, candles, signs). */
+.world .clickable {
+  pointer-events: auto;
+  cursor: pointer;
+}

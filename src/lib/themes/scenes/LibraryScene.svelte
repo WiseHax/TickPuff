@@ -1,11 +1,13 @@
 <script lang="ts">
   import type { TimeOfDay } from '$lib/types';
   import type { SceneProps } from './index';
+  import { switchable } from './parts/switchable.svelte';
   import { BOTTOM, GROUND_Y, H, TOP, W, canopy, mix, rng, starField } from './art';
 
   let { time, season }: SceneProps = $props();
   const dark = $derived(time === 'night' || time === 'late-night');
-  const candleLit = $derived(dark || time === 'sunset');
+  const candle = switchable(() => dark || time === 'sunset');
+  const lamp = switchable(() => dark || time === 'sunset');
 
   const BOOK_COLORS = ['#8e3b2f', '#2f5d50', '#c99a3b', '#3b4a7a', '#6b3a5a', '#d8c7a0', '#4a6b2f', '#a0522d'];
 
@@ -286,7 +288,7 @@
   </svg>
 
   <!-- Candle on a little stool by the "Candle" zone (x ≈ 0.66). -->
-  <div class="prop candle" class:lit={candleLit}>
+  <div class="prop candle clickable" class:lit={candle.on} onclick={candle.toggle} aria-hidden="true">
     <svg viewBox="0 0 60 120" aria-hidden="true">
       <rect x="4" y="82" width="52" height="8" rx="2" fill="#5a3a26" />
       <rect x="10" y="90" width="6" height="30" fill="#4a2e1e" />
@@ -301,7 +303,7 @@
 
 <div class="world-layer" style="--depth: 40">
   <!-- Hanging lamp. -->
-  <div class="lamp" class:lit={dark || time === 'sunset'}>
+  <div class="lamp clickable" class:lit={lamp.on} onclick={lamp.toggle} aria-hidden="true">
     <svg viewBox="0 0 120 200" aria-hidden="true">
       <path d="M60,0 L60,110" stroke="#1a0e08" stroke-width="3" />
       <path d="M20,150 C20,118 100,118 100,150 Z" fill="#2f5d50" />

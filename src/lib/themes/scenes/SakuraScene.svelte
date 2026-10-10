@@ -1,11 +1,13 @@
 <script lang="ts">
   import type { SceneProps } from './index';
   import Sky from './parts/Sky.svelte';
+  import { switchable } from './parts/switchable.svelte';
   import { BOTTOM, GROUND_Y, H, TOP, W, canopy, grass, mix, ridge, rng, specks } from './art';
 
   let { time, season }: SceneProps = $props();
   const dark = $derived(time === 'night' || time === 'late-night');
   const lit = $derived(dark || time === 'sunset');
+  const toro = switchable(() => lit);
 
   /** Tree colours through the year: blossoms, summer leaves, momiji, snow. */
   const FOLIAGE = {
@@ -171,7 +173,7 @@
   </svg>
 
   <!-- Stone lantern (tōrō), lit at dusk and night. -->
-  <div class="prop toro" class:lit>
+  <div class="prop toro clickable" class:lit={toro.on} onclick={toro.toggle} aria-hidden="true">
     <svg viewBox="0 0 60 110" aria-hidden="true">
       <path d="M6,24 L30,8 L54,24 Z" fill="#6d6872" />
       <rect x="26" y="2" width="8" height="8" rx="3" fill="#6d6872" />

@@ -1,11 +1,13 @@
 <script lang="ts">
   import type { SceneProps } from './index';
   import Sky from './parts/Sky.svelte';
+  import { switchable } from './parts/switchable.svelte';
   import { BOTTOM, GROUND_Y, H, TOP, W, mix, rng } from './art';
 
   let { time, season }: SceneProps = $props();
   const dark = $derived(time === 'night' || time === 'late-night');
   const neonOn = $derived(dark || time === 'sunset');
+  const ramen = switchable(() => neonOn);
 
   interface Building {
     x: number;
@@ -208,7 +210,7 @@
   <svg class="fan" viewBox="0 0 50 50" aria-hidden="true"><circle cx="25" cy="25" r="20" /></svg>
 
   <!-- Ramen sign on the right (the "Neon sign" zone). -->
-  <div class="neon-sign" class:on={neonOn}>
+  <div class="neon-sign clickable" class:on={ramen.on} onclick={ramen.toggle} aria-hidden="true">
     <span class="neon-text" lang="ja">ラーメン</span>
     <span class="neon-sub">OPEN</span>
   </div>
