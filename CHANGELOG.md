@@ -6,14 +6,42 @@ All notable changes to TickPuff are documented here. The format follows
 
 ## [Unreleased]
 
-### Automatic updates (not released yet)
+## [0.4.0] — seasons, the real sun and friendship
 
-- In-app updates: TickPuff checks GitHub for a new release a little after it starts and shows a small notice;
-  nothing is downloaded or installed until you press **Update**. Updates are signed and verified before
-  installing. Turn the startup check off, or check by hand, in Settings → About.
+### Worlds
+
+- Day and night follow the real sunrise and sunset when a weather location is set (calculated on your
+  computer); without one, they follow the clock as before.
+- Seasons: every world changes through the year — snowy pines and autumn colours in the forest; blossoms,
+  summer leaves, momiji and snow in the sakura garden; snow on the cyber city rooftop; a seasonal tree outside
+  the library window. Seasons follow the calendar (flipped south of the equator) or stay fixed, in
+  Settings → World.
+- Life in the background: shooting stars at night, flocks of birds by day, schools of fish in the aquarium and
+  a train gliding through the cyber city.
+- Click the lanterns, the candle, the lamp or the ramen sign to switch them on or off; the forest mushrooms
+  bounce.
+
+### Companion
+
+- Give your companion a name (Settings → Companion); it's used in tooltips and for screen readers.
+- Friendship grows as you pet your companion and finish focus sessions, and never goes down. Petting counts up
+  to 15 times a day.
+- Friendship unlocks a flower and then a crown for your companion to wear.
+- The first time you open TickPuff each day, your companion runs over to say good morning.
+
+### Focus
+
+- The daily summary widget shows a chart of your focus over the last seven days.
+
+### Updates and distribution
+
+- In-app updates for the GitHub version: TickPuff checks GitHub for a new release a little after it starts and
+  shows a small notice; nothing is downloaded or installed until you press **Update**. Updates are signed and
+  verified before installing. Turn the startup check off, or check by hand, in Settings → About.
 - Release workflow: pushing a version tag builds the Windows installers and the signed update packages into a
   draft GitHub release.
-- The privacy note in Settings now mentions the update check.
+- TickPuff is on the [Microsoft Store](https://apps.microsoft.com/detail/9NCCLZRSL5WV); the Store version is
+  signed by Microsoft and updated by the Store.
 
 ## [0.3.0] — a calmer layout, reactions, tray and mini mode
 
