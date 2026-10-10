@@ -1,6 +1,6 @@
 # TickPuff privacy policy
 
-_Last updated: October 8, 2026_
+_Last updated: October 10, 2026_
 
 TickPuff is a desktop clock with a living world and a companion. It has no accounts, no ads, no analytics and no
 tracking.
@@ -16,7 +16,8 @@ TickPuff only connects to the internet in these cases:
 
 - **Weather (optional).** If you set a weather location, TickPuff asks [Open-Meteo](https://open-meteo.com/) for
   that location's forecast. Only the coordinates of the place you chose are sent. Open-Meteo's own terms and
-  privacy policy apply to that request.
+  privacy policy apply to that request. The location is also used, on your computer only, to work out sunrise,
+  sunset and the season.
 - **City search (optional).** When you search for a city in the weather settings, the text you type is sent to
   Open-Meteo's geocoding service to find matching places.
 - **Update check (GitHub download only).** The version downloaded from GitHub checks GitHub once at startup for
