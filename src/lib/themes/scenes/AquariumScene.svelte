@@ -94,6 +94,18 @@
   const seaGrass = grass(57, GROUND_Y + 14, 150, 18, 48);
 
   const water = mix(TOP, BOTTOM, 45);
+
+  const schools = Array.from({ length: 3 }, (_, i) => ({
+    top: 22 + random() * 30,
+    width: 11 + random() * 7,
+    duration: 45 + random() * 35,
+    delay: -random() * 60,
+    reverse: i % 2 === 1,
+    fish: Array.from({ length: 6 + Math.floor(random() * 5) }, () => ({
+      x: random() * 95,
+      y: 8 + random() * 34,
+    })),
+  }));
   const far = mix(BOTTOM, TOP, 70);
   const mid = mix(BOTTOM, '#062a44', 70);
   const sandColor = $derived(dark ? mix('#3a4a5a', BOTTOM, 40) : mix('#f2dcae', BOTTOM, 70));
@@ -114,6 +126,24 @@
 </div>
 
 <div class="world-layer" style="--depth: 14">
+  <!-- Distant schools of fish drifting through the background. -->
+  {#each schools as school, i (i)}
+    <svg
+      class="school"
+      class:reverse={school.reverse}
+      style="top: {school.top}%; width: {school.width}%; animation-duration: {school.duration}s; animation-delay: {school.delay}s"
+      viewBox="0 0 120 50"
+      aria-hidden="true"
+    >
+      {#each school.fish as fish, j (j)}
+        <path
+          d="M{fish.x},{fish.y} q6,-4 12,0 l5,-3 v6 l-5,-3 q-6,4 -12,0 Z"
+          style="fill: {mix(BOTTOM, '#04182c', 55)}"
+          opacity={dark ? 0.35 : 0.55}
+        />
+      {/each}
+    </svg>
+  {/each}
   {#each kelpBack as k, i (i)}
     <svg
       class="kelp sway"
@@ -297,6 +327,37 @@
     background: #9ff4ff;
     box-shadow: 0 0 8px 2px rgba(120, 230, 255, 0.7);
     animation: glimmer 6s ease-in-out infinite;
+  }
+  .school {
+    position: absolute;
+    left: 0;
+    overflow: visible;
+    animation: swim-across 60s linear infinite;
+  }
+  .school.reverse {
+    animation-name: swim-back;
+  }
+  @keyframes swim-across {
+    0% {
+      transform: translate(-15vw, 0);
+    }
+    50% {
+      transform: translate(50vw, -2vh);
+    }
+    100% {
+      transform: translate(115vw, 0);
+    }
+  }
+  @keyframes swim-back {
+    0% {
+      transform: translate(115vw, 0) scaleX(-1);
+    }
+    50% {
+      transform: translate(50vw, 2vh) scaleX(-1);
+    }
+    100% {
+      transform: translate(-15vw, 0) scaleX(-1);
+    }
   }
   @keyframes sway {
     from {
