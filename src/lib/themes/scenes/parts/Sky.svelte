@@ -4,7 +4,7 @@
 -->
 <script lang="ts">
   import type { TimeOfDay } from '$lib/types';
-  import { H, W, clouds as makeClouds, starField } from '../art';
+  import { H, W, clouds as makeClouds, rng, starField } from '../art';
 
   let {
     time,
@@ -27,6 +27,33 @@
     return [0, 1, 2].map((g) => stars.filter((_, i) => i % 3 === g));
   });
   const cloudList = $derived(makeClouds(seed * 17 + 3, cloudCount, 70, 300));
+
+  /** Occasional shooting stars: each streak is visible for a moment of a long cycle. */
+  const shootingStars = $derived.by(() => {
+    const random = rng(seed * 13 + 5);
+    return Array.from({ length: 3 }, () => ({
+      left: 15 + random() * 60,
+      top: 6 + random() * 22,
+      cycle: 18 + random() * 22,
+      delay: -random() * 30,
+    }));
+  });
+
+  /** A few small flocks crossing the sky by day. */
+  const flocks = $derived.by(() => {
+    const random = rng(seed * 7 + 11);
+    return Array.from({ length: 2 }, (_, i) => ({
+      top: 14 + random() * 20,
+      duration: 50 + random() * 30,
+      delay: -random() * 60 - i * 25,
+      size: 0.8 + random() * 0.5,
+      birds: Array.from({ length: 3 + Math.floor(random() * 3) }, () => ({
+        x: random() * 70,
+        y: random() * 26,
+        flap: 0.45 + random() * 0.25,
+      })),
+    }));
+  });
 
   /** Sun / moon position (fractions of the scene) per time of day. */
   const ORBIT: Record<TimeOfDay, { x: number; y: number }> = {
@@ -60,6 +87,32 @@
       >
         {#each group as star, i (i)}
           <circle cx={star.x} cy={star.y} r={star.r} />
+        {/each}
+      </svg>
+    {/each}
+  {/if}
+  {#if dark}
+    {#each shootingStars as star, i (i)}
+      <span
+        class="shooting-star"
+        style="left: {star.left}%; top: {star.top}%; animation-duration: {star.cycle}s; animation-delay: {star.delay}s"
+      ></span>
+    {/each}
+  {:else}
+    {#each flocks as flock, i (i)}
+      <svg
+        class="flock"
+        style="top: {flock.top}%; width: {6 *
+          flock.size}%; animation-duration: {flock.duration}s; animation-delay: {flock.delay}s"
+        viewBox="0 0 100 40"
+        aria-hidden="true"
+      >
+        {#each flock.birds as bird, j (j)}
+          <path
+            class="bird"
+            style="animation-duration: {bird.flap}s"
+            d="M{bird.x},{bird.y + 8} q6,-7 12,0 q6,-7 12,0"
+          />
         {/each}
       </svg>
     {/each}
@@ -124,6 +177,32 @@
     fill: #fff;
     animation: twinkle 4s ease-in-out infinite alternate;
   }
+  .shooting-star {
+    position: absolute;
+    width: 140px;
+    height: 2px;
+    border-radius: 2px;
+    background: linear-gradient(to left, rgba(255, 255, 255, 0.95), transparent);
+    opacity: 0;
+    transform: rotate(-20deg);
+    animation: shoot 24s linear infinite;
+  }
+  .flock {
+    position: absolute;
+    left: 0;
+    overflow: visible;
+    animation: fly-across 60s linear infinite;
+  }
+  .bird {
+    fill: none;
+    stroke: rgba(30, 30, 40, 0.55);
+    stroke-width: 2.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transform-box: fill-box;
+    transform-origin: center;
+    animation: flap 0.5s ease-in-out infinite alternate;
+  }
   .clouds {
     position: absolute;
     inset: 0;
@@ -186,6 +265,37 @@
     height: 10%;
     left: 62%;
     top: 62%;
+  }
+  @keyframes shoot {
+    0%,
+    92% {
+      opacity: 0;
+      transform: rotate(-20deg) translateX(0);
+    }
+    93% {
+      opacity: 1;
+    }
+    97% {
+      opacity: 0;
+      transform: rotate(-20deg) translateX(-260px);
+    }
+    100% {
+      opacity: 0;
+      transform: rotate(-20deg) translateX(-260px);
+    }
+  }
+  @keyframes flap {
+    to {
+      transform: scaleY(-0.5);
+    }
+  }
+  @keyframes fly-across {
+    from {
+      transform: translateX(-20vw);
+    }
+    to {
+      transform: translateX(120vw);
+    }
   }
   @keyframes twinkle {
     from {
