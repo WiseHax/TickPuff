@@ -3,6 +3,7 @@
   import { world } from '$lib/stores/world';
   import { timeOfDay } from '$lib/core/time/clock';
   import { weatherSettings } from '$lib/integrations/weather';
+  import { SEASON_SETTINGS, season, seasonSetting } from '$lib/stores/season';
 </script>
 
 <p class="hint">Each world remembers its own companion and atmosphere.</p>
@@ -13,6 +14,19 @@
     Day and night follow your clock. Set a weather location (Integrations) to follow the real sunrise and sunset.
   {/if}
 </p>
+<div class="field">
+  <span class="field-label" id="season-label">
+    Season
+    {#if $seasonSetting === 'auto'}<span class="hint">Following the calendar — now {$season}</span>{/if}
+  </span>
+  <div class="segmented" role="radiogroup" aria-labelledby="season-label">
+    {#each SEASON_SETTINGS as value (value)}
+      <button role="radio" aria-checked={$seasonSetting === value} onclick={() => seasonSetting.set(value)}>
+        {value}
+      </button>
+    {/each}
+  </div>
+</div>
 <div class="grid" role="radiogroup" aria-label="World">
   {#each THEMES as theme (theme.id)}
     {@const colors = theme.colors[$timeOfDay]}

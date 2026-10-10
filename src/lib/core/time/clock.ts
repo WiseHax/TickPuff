@@ -36,6 +36,9 @@ export interface Observer {
 
 const observer = writable<Observer | null>(null);
 
+/** The user's location for sun and season calculations, if they set one. */
+export const observerLocation = { subscribe: observer.subscribe };
+
 /** Set by the weather integration when the user picks (or clears) a location. */
 export function setObserver(location: Observer | null): void {
   observer.set(location ? { latitude: location.latitude, longitude: location.longitude } : null);
