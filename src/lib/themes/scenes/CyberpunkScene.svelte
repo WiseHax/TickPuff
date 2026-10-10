@@ -3,7 +3,7 @@
   import Sky from './parts/Sky.svelte';
   import { BOTTOM, GROUND_Y, H, TOP, W, mix, rng } from './art';
 
-  let { time }: SceneProps = $props();
+  let { time, season }: SceneProps = $props();
   const dark = $derived(time === 'night' || time === 'late-night');
   const neonOn = $derived(dark || time === 'sunset');
 
@@ -169,6 +169,11 @@
     <!-- Puddles reflecting the city. -->
     <ellipse cx="560" cy="790" rx="170" ry="18" fill="url(#cyber-reflect)" />
     <ellipse cx="1150" cy="840" rx="220" ry="22" fill="url(#cyber-reflect)" />
+    {#if season === 'winter'}
+      <!-- Winter: a thin layer of snow on the deck. -->
+      <rect x="0" y={GROUND_Y - 4} width={W} height={H - GROUND_Y + 10} fill="#eef3fb" opacity="0.32" />
+      <rect x="0" y={GROUND_Y - 6} width={W} height="10" fill="#f4f8ff" opacity="0.7" />
+    {/if}
     <!-- Back railing (the "Rooftop railing" zone runs along it). -->
     <g style="fill: {mix(roof, '#000', 50)}">
       <rect x="0" y={GROUND_Y - 58} width={W} height="6" />
@@ -177,6 +182,10 @@
         <rect {x} y={GROUND_Y - 58} width="5" height="58" />
       {/each}
     </g>
+    {#if season === 'winter'}
+      <rect x="0" y={GROUND_Y - 62} width={W} height="5" rx="2" fill="#f4f8ff" opacity="0.85" />
+      <path d="M110,470 L195,425 L280,470 L270,474 L195,434 L120,474 Z" fill="#f4f8ff" opacity="0.9" />
+    {/if}
     <!-- Water tank and AC units. -->
     <g style="fill: {mix(roof, '#000', 45)}">
       <rect x="120" y="470" width="150" height="150" rx="8" />
