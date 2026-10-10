@@ -1,9 +1,9 @@
 <script lang="ts">
   import type { TimeOfDay } from '$lib/types';
   import type { SceneProps } from './index';
-  import { BOTTOM, GROUND_Y, H, TOP, W, mix, rng, starField } from './art';
+  import { BOTTOM, GROUND_Y, H, TOP, W, canopy, mix, rng, starField } from './art';
 
-  let { time }: SceneProps = $props();
+  let { time, season }: SceneProps = $props();
   const dark = $derived(time === 'night' || time === 'late-night');
   const candleLit = $derived(dark || time === 'sunset');
 
@@ -54,6 +54,8 @@
   const wall = mix(TOP, BOTTOM, 55);
   const wood = mix(BOTTOM, '#3a2216', 45);
   const woodDark = mix(BOTTOM, '#1a0e08', 30);
+  const TREE = { spring: '#f6a8c4', summer: '#5f9e4f', autumn: '#e0782f', winter: '#eef3f8' } as const;
+
   const SKY: Record<TimeOfDay, [string, string]> = {
     morning: ['#a8cbe8', '#ffe2c0'],
     day: ['#8fc8f0', '#d6ecfa'],
@@ -101,11 +103,28 @@
     {/if}
     <circle cx={orb.x} cy={orb.y} r="110" fill="url(#lib-orb-glow)" />
     <circle cx={orb.x} cy={orb.y} r="34" fill={dark ? '#fdfbe8' : time === 'sunset' ? '#ffc070' : '#fffbe6'} />
+    <!-- A tree outside the window that changes with the seasons. -->
+    <rect x="905" y="430" width="10" height="200" fill={dark ? '#0a0e1c' : '#5a4636'} />
+    <path
+      d={canopy(77, 910, 410, 66, 54, 12)}
+      fill={dark ? '#0d1424' : TREE[season]}
+      opacity={season === 'winter' ? 0.75 : 0.95}
+    />
     <!-- Rooftops of the town outside. -->
     <path
       d="M480,620 L480,500 L540,500 L540,470 L565,452 L590,470 L590,490 L650,490 L650,450 L690,450 L690,420 L706,404 L722,420 L722,480 L790,480 L790,460 L870,460 L870,494 L950,494 L950,440 L974,424 L998,440 L998,476 L1060,476 L1060,456 L1120,456 L1120,620 Z"
       fill={dark ? '#0a0e1c' : 'rgba(60, 70, 100, 0.4)'}
     />
+    {#if season === 'winter'}
+      <path
+        d="M480,500 L540,500 L540,470 L565,452 L590,470 M650,450 L690,450 L690,420 L706,404 L722,420 M790,460 L870,460 M950,440 L974,424 L998,440 M1060,456 L1120,456"
+        fill="none"
+        stroke="#f4f8ff"
+        stroke-width="6"
+        stroke-linecap="round"
+        opacity={dark ? 0.55 : 0.9}
+      />
+    {/if}
     {#if dark}
       {#each [[560, 480], [668, 470], [704, 430], [820, 476], [972, 450], [1080, 470]] as [x, y], i (i)}
         <rect {x} {y} width="8" height="8" fill="#ffd27a" />
