@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { get } from 'svelte/store';
   import { CompanionRenderer } from '$lib/companion/engine/CompanionRenderer';
   import { COMPANIONS } from '$lib/companion/registry/companions';
   import { companionState, rendererStatus } from '$lib/companion/status';
@@ -11,6 +12,9 @@
   import { COMPANION_SIZE_SCALE, companionSize, performanceProfile, ui } from '$lib/stores/settings';
   import { mediaService, nowPlaying } from '$lib/integrations/media';
   import { isTauri } from '$lib/core/platform/tauri';
+  import { bonds, nameFor, unlockedAccessories } from '$lib/stores/bond';
+  import { lastGreeting } from '$lib/stores/greeting';
+  import { localDateKey } from '$lib/core/time/clock';
   import type { CompanionActivity } from '$lib/types';
 
   /** Away for at least this long (no input, or window hidden) → the companion greets you on return. */
@@ -42,8 +46,10 @@
   // A boolean, so the 3-second media poll only touches the renderer when playback starts or stops.
   const musicPlaying = $derived($nowPlaying.media?.status === 'playing');
   const definition = $derived(COMPANIONS[$activeThemeState.companion]);
+  const displayName = $derived(nameFor($bonds, definition.id, definition.name));
+  const accessories = $derived(unlockedAccessories($bonds[definition.id]?.points ?? 0));
   const label = $derived(
-    `${definition.name}${$companionState ? `, ${ACTIVITY_LABELS[$companionState.activity]}` : ''}. Press to pet.`,
+    `${displayName}${$companionState ? `, ${ACTIVITY_LABELS[$companionState.activity]}` : ''}. Press to pet.`,
   );
 
   function create(initial?: ReturnType<CompanionRenderer['snapshot']>) {
@@ -55,6 +61,7 @@
         size: COMPANION_SIZE_SCALE[$companionSize],
         initial,
         onStateChange: (state) => companionState.set(state),
+        onPet: () => bonds.pet(definition.id),
       });
       rendererStatus.set('running');
       // Dev builds only: inspect the 3D layer from the console (`__tickpuff`).
@@ -69,8 +76,19 @@
   onMount(() => {
     create();
     const offFocus = on('focus:completed', (completion) => {
-      if (completion.phase === 'focus') renderer?.celebrate();
+      if (completion.phase === 'focus') {
+        renderer?.celebrate();
+        bonds.focusCompleted(definition.id);
+      }
     });
+
+    // First launch of the day: the companion comes over to say good morning.
+    const todayKey = localDateKey(new Date());
+    let greetTimer: ReturnType<typeof setTimeout> | undefined;
+    if (get(lastGreeting) !== todayKey) {
+      lastGreeting.set(todayKey);
+      greetTimer = setTimeout(() => renderer?.greet(), 2500);
+    }
 
     // Presence: notice when the user comes back after a while.
     let lastSeen = Date.now();
@@ -99,6 +117,7 @@
       window.removeEventListener('keydown', seen);
       document.removeEventListener('visibilitychange', onVisibility);
       releaseMedia();
+      clearTimeout(greetTimer);
       offFocus();
       renderer?.dispose();
       renderer = null;
@@ -128,6 +147,10 @@
   });
 
   $effect(() => {
+    renderer?.setAccessories(accessories);
+  });
+
+  $effect(() => {
     renderer?.setWorld({
       theme: $activeTheme,
       colors: $activeColors,
@@ -143,7 +166,7 @@
 </script>
 
 <div class="companion-host" bind:this={host}></div>
-<button class="companion-hitbox" bind:this={hitbox} aria-label={label} title={definition.name}></button>
+<button class="companion-hitbox" bind:this={hitbox} aria-label={label} title={displayName}></button>
 
 <style>
   .companion-host {
